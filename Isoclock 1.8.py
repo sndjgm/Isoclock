@@ -2,7 +2,7 @@
 """
 Created on Sun Jul 19 18:20:11 2020
 
-@author: 刘国奇
+@author: Guoqi Liu  642847452@qq.com  
 """
 
 
@@ -276,9 +276,9 @@ def Age_Calculate_average():
         File_name=np.loadtxt(outputpath+'//'+'result_all.csv',dtype=str,delimiter=',',skiprows=1,usecols=(1))
         date=np.loadtxt(outputpath+'//'+'result_all.csv',delimiter=',',skiprows=1,usecols=(3,4,5,6,7,8,9,10,11,12,13,14,15,16,18,19,20,21,22))
         print(Standard_names)
-        #print(name)
+      
         date_all=pd.DataFrame(date,index=name).astype(float)
-        #因子计算
+      
         def coefficient(NIST_STD):
             try:
                 if NIST_STD in ['NIST610','NIST 610','SRM610','SRM 610']:
@@ -353,7 +353,7 @@ def Age_Calculate_average():
         f208_206=1
         f232_206=1/f208_232
         f208_204=1
-        #校正后计算同位素结果
+       
         
         result_cal_207Pb_206Pb=date_all[0]*f207_206
         
@@ -422,13 +422,13 @@ def Age_Calculate_average():
 
         workbook = xlwt.Workbook()
         worksheet=workbook.add_sheet('My Worksheet',cell_overwrite_ok=True)
-        style = xlwt.XFStyle() # 初始化样式
-        font = xlwt.Font() # 为样式创建字体
+        style = xlwt.XFStyle() 
+        font = xlwt.Font() 
         font.name = 'Times New Roman' 
-        font.bold = True # 黑体
-        font.underline = True # 下划线
-        font.italic = True # 斜体字
-        style.font = font # 设定样式
+        font.bold = True 
+        font.underline = True 
+        font.italic = True 
+        style.font = font 
         
         worksheet.write(0, 0, 'FileNames')
         worksheet.write(0, 1, 'SampleName')
@@ -501,11 +501,11 @@ def Age_Calculate_average():
         logging.info('The calculation was successful.The file saved in:%s',outputpath)
     except ValueError:
         tk.messagebox.showinfo(title='Information！', message='“result_all.csv"file not found or  the format is incorrect！')
-        print('未找到“result_all.csv"文件 或数据格式不正确！请先完成<Pb校正计算>!')
+        
         logging.critical('“result_all.csv" were not found or the format is incorrect.')    
     except NameError:
         tk.messagebox.showinfo(title='Information！', message='Output directory or standard setting error！')
-        print('文件输出目录或标样未设置！')
+       
         logging.error('The output directory is not set.') 
     except OSError:
         tk.messagebox.showinfo(title='Information！', message='"result_all.csv" not found！')
@@ -660,13 +660,13 @@ def Age_Calculate():
 
         workbook = xlwt.Workbook()
         worksheet=workbook.add_sheet('My Worksheet',cell_overwrite_ok=True)
-        style = xlwt.XFStyle() # 初始化样式
-        font = xlwt.Font() # 为样式创建字体
+        style = xlwt.XFStyle() 
+        font = xlwt.Font()
         font.name = 'Times New Roman' 
-        font.bold = True # 黑体
-        font.underline = True # 下划线
-        font.italic = True # 斜体字
-        style.font = font # 设定样式
+        font.bold = True 
+        font.underline = True 
+        font.italic = True 
+        style.font = font 
         worksheet.write(0, 0, 'File Names')
         worksheet.write(0, 1, 'Sample Names')
         worksheet.write(0, 2, '207Pb/206Pb')
@@ -726,13 +726,13 @@ def Age_Calculate():
         workbook.save('cal_age_result_L'+now+'.xls')
         
         logging.info('The calculation was successful.The file saved in:%s',outputpath)
-        print('年龄计算完成！文件保存目录为：',outputpath)
+       
     except ValueError:
-        print('未找到“result_all.csv"文件 或数据格式不正确！请先完成<Pb校正计算>!')
+        
         tk.messagebox.showinfo(title='Information！', message='result_all.csv"file not found or  the format is incorrect！')
         logging.critical('“result_all.csv" were not found or the format is incorrect.')  
     except NameError:
-        print('文件输出目录或标样未设置！')
+        
         tk.messagebox.showinfo(title='Information！', message='Output directory or standard setting error！')
         logging.error('The output directory is not set.') 
     except OSError:
@@ -908,7 +908,7 @@ def dataprocess():
                 writer.writerow(r)
         
 
-    #tk.messagebox.showinfo(title='Congratulations！', message='数据已全部处理成功！')
+  
     
     
         '''fileSubfix =['npy','png']
@@ -922,7 +922,7 @@ def dataprocess():
 
     except NameError:
         logging.error('Standard or dwell times is not set !')
-        print("积分时间未设置或标样年龄未正确设置！")
+       
         tk.messagebox.showinfo(title='Error！', message='Standard or dwell times is not set !')
 
     except KeyError:
@@ -966,7 +966,7 @@ def samples_method(name,Hg202_b,Hg204_b,Pb206_b,Pb207_b,Pb208_b,Th232_b,U238_b,H
     end_s=int(s1/Timeinternal)
 
     
-    # 样品计算
+    #  Calculation for samples
     Hg204_Hg202_s=Hg204_s/Hg202_s
     Hg204cal_s=(np.average(Hg202_s)-np.average(Hg202_s))*0.229883    
     m204_s=np.where(Hg204cal_s<(np.std(Hg204_s)/sqrt(end_s-start_s)),0,Hg204cal_s)    
@@ -989,7 +989,7 @@ def samples_method(name,Hg202_b,Hg204_b,Pb206_b,Pb207_b,Pb208_b,Th232_b,U238_b,H
         pass
     
     
-    #过滤数组
+    #filtering of outliers
     
     
 
@@ -1067,7 +1067,7 @@ def Std_method(name,Hg202_b,Hg204_b,Pb206_b,Pb207_b,Pb208_b,Th232_b,U238_b,Hg202
         end_b=int(b1/Timeinternal)
         start_s=int(s0/Timeinternal)
         end_s=int(s1/Timeinternal)
-        # 样品计算
+        # Calculation for samples
         Hg204_Hg202_s=Hg204_s/Hg202_s
         Hg204cal_s=(np.average(Hg202_s)-np.average(Hg202_s))*0.229883
         
@@ -1094,7 +1094,7 @@ def Std_method(name,Hg202_b,Hg204_b,Pb206_b,Pb207_b,Pb208_b,Th232_b,U238_b,Hg202
         Pb208_Pb204_s=(Pb208_s-np.average(Pb208_b))/Pb204_s
         
         
-        #过滤数组
+        #filtering of outliers
         
         
         x=np.arange(len(Pb206_s))
@@ -1278,7 +1278,7 @@ def instructure0():
         print('Start Loading....'.center(scale//2,'='))
         fill_line = canvas.create_rectangle(1.5, 1.5, 0, 23, width=0, fill="green")
         
-        n = 465 / scale  # 465是矩形填充满的次数
+        n = 465 / scale 
         files_list=[]
 
         for name in files:
@@ -1389,14 +1389,14 @@ def instructure0():
             
             
             n = n + 465 / scale
-            # 以矩形的长度作为变量值更新
+           
             
             
             canvas.coords(fill_line, (0, 0, n, 60))
             
             
             window.update()
-            time.sleep(0)  # 时间为0，即飞速清空进度条
+            time.sleep(0) 
             w.delete("all")
             #print("\r{:^3.0f}%[{}->{}]".format(c,a,b),end='')
     np.save(outputpath+'//'+'Time_setting',num)
@@ -1416,8 +1416,7 @@ def instructure0():
 
     tk.messagebox.showinfo(title='Information！', message='Loading completed!Total '+str(len(files_list))+'files have been loaded.')
     logging.info("Total %s files have been loaded.",str(len(files_list)))  
-        #print('数据加载完成！共加载文件',scale,'个。')
-        #print('<4>点击【存储list】按钮，保存list 文件')
+        
    
 
     global theLB,sc
@@ -1484,10 +1483,7 @@ def instructure0():
     cancleButton=Button(frmLB,text='Cancle',command=cancleall)
     cancleButton.grid(row =11,column =1,pady=5)
 
-    #STDbutton=Button(frmLB,text='全部标样',command=stdbutton)
-    #STDbutton.grid(row =8,column =3,pady=5)
-    #STDbutton=Button(frmLB,text='全部样品',command=sambutton)
-    #STDbutton.grid(row =8,column =4,pady=5)
+   
     
     #window.mainloop()
     return fig_name
@@ -1664,10 +1660,10 @@ def instructure1():
         sampleslist[name]=Sampleslist1[name.split('.')[0]]
         i=i+1
         n = n + 465 / scale
-            # 以矩形的长度作为变量值更新
+           
         canvas.coords(fill_line, (0, 0, n, 60))
         window.update()
-        time.sleep(0)  # 时间为0，即飞速清空进度条
+        time.sleep(0)  
         #print("\r{:^3.0f}%[{}->{}]".format(c,a,b),end='')
         w.delete("all")  
     np.save(outputpath+'//'+'Time_setting',num)
@@ -1687,8 +1683,7 @@ def instructure1():
         print()
         logging.info("Total %s files have been loaded.",str(len(files_list)))  
         tk.messagebox.showinfo(title='Information！', message='Loading compeleted！Total '+str(len(sampleslist))+'files')
-        #print('数据加载完成！共加载文件',scale,'个。')
-        #print('<4>点击【存储list】按钮，保存list 文件')
+      
       ''' 
 
    
@@ -1735,7 +1730,7 @@ def instructure1():
                 print()
             except NameError:
                 logging.error('Standard is not set!')
-                print('标样未设置！')
+               
             except Exception as e:
                 print(str(e))
                 logging.error('Unknown erro:%s',str(e))
@@ -1751,10 +1746,7 @@ def instructure1():
     cancleButton=Button(frmLB,text='Cancle',command=cancleall)
     cancleButton.grid(row =11,column =1,pady=5)
 
-    #STDbutton=Button(frmLB,text='全部标样',command=stdbutton)
-    #STDbutton.grid(row =8,column =3,pady=5)
-    #STDbutton=Button(frmLB,text='全部样品',command=sambutton)
-    #STDbutton.grid(row =8,column =4,pady=5)
+   
     return fig_name
     
 
@@ -1797,7 +1789,7 @@ def instructure2():
         elif os.path.splitext(name)[1]=='.FIN2':
             files_list.append(name)
             
-    #file_path=tk.filedialog.askopenfilename(title=u'选择LIST文件', initialdir=(os.path.expanduser(default_dir)))
+    #file_path=tk.filedialog.askopenfilename(title=u'Please Choose the List File', initialdir=(os.path.expanduser(default_dir)))
 
     listfile=open(default_dir+'//'+file_path)
     listfile.readline()
@@ -1840,7 +1832,7 @@ def instructure2():
     print('Start Loading....'.center(scale//2,'='))
     fill_line = canvas.create_rectangle(1.5, 1.5, 0, 23, width=0, fill="green")
         
-    n = 465 / scale  # 465是矩形填充满的次数
+    n = 465 / scale  
     for fname in files_list:
         a='*'*i
         b='.'*(scale-i)
@@ -1937,10 +1929,10 @@ def instructure2():
         
         i=i+1
         n = n + 465 / scale
-            # 以矩形的长度作为变量值更新
+          
         canvas.coords(fill_line, (0, 0, n, 60))
         window.update()
-        time.sleep(0)  # 时间为0，即飞速清空进度条
+        time.sleep(0)  
         w.delete("all")
         #print("\r{:^3.0f}%[{}->{}]".format(c,a,b),end='')
     np.save(outputpath+'//'+'Time_setting',num)
@@ -1959,8 +1951,7 @@ def instructure2():
     print()
     tk.messagebox.showinfo(title='Information！', message='Loading compeleted！Total '+str(scale)+'files.')
     logging.info("Total %s files have been loaded.",str(len(files_list)))  
-        #print('数据加载完成！共加载文件',scale,'个。')
-        #print('<4>点击【存储list】按钮，保存list 文件')
+       
        
 
     global theLB,sc
@@ -2024,10 +2015,7 @@ def instructure2():
     cancleButton=Button(frmLB,text='Cancle',command=cancleall)
     cancleButton.grid(row =11,column =1,pady=5)
     
-    #STDbutton=Button(frmLB,text='全部标样',command=stdbutton)
-    #STDbutton.grid(row =8,column =3,pady=5)
-    #STDbutton=Button(frmLB,text='全部样品',command=sambutton)
-    #STDbutton.grid(row =8,column =4,pady=5)
+ 
     return fig_name
         
 
@@ -2059,7 +2047,7 @@ def dataprocess_selected():
     
     
             
-    #tk.messagebox.showinfo(title='Congratulations！', message='Successful！')
+ 
                 
                 
 
@@ -2073,7 +2061,7 @@ def settime():
     global end_s
     
     
-    #print('请按提示输入背景及采样时间！')
+    
     b0=tk.simpledialog.askfloat(title = 'Intergrating time',prompt='Background Start (second)：',initialvalue = '1')
     
     b1=tk.simpledialog.askfloat(title = 'Intergrating time',prompt='Background End (second)：',initialvalue = '15')
@@ -2097,7 +2085,7 @@ def settime():
     
     np.save('Time_setting.npy',num)
     tk.messagebox.showinfo(title='Information！', message='The integration time is set successfully. Please click [start calculation] to complete the data processing.')
-    #print('积分时间设置成功，请点击【开始计算】按钮完成数据处理。')       
+         
         
         
 def Sample_Pb_Calculate():
@@ -2264,13 +2252,13 @@ def Sample_Pb_Calculate():
 
         workbook = xlwt.Workbook()
         worksheet=workbook.add_sheet('My Worksheet',cell_overwrite_ok=True)
-        style = xlwt.XFStyle() # 初始化样式
-        font = xlwt.Font() # 为样式创建字体
+        style = xlwt.XFStyle() 
+        font = xlwt.Font() 
         font.name = 'Times New Roman' 
-        font.bold = True # 黑体
-        font.underline = True # 下划线
-        font.italic = True # 斜体字
-        style.font = font # 设定样式          
+        font.bold = True
+        font.underline = True 
+        font.italic = True 
+        style.font = font     
         worksheet.write(0, 0, 'SampleName')
         worksheet.write(0, 1, '207Pb/206Pb')
         worksheet.write(0, 2, '2s')
@@ -2338,14 +2326,14 @@ def Sample_Pb_Calculate():
         workbook.save('Age_result_corPb'+now+'.xls')
         
         logging.info('The calculation was successful.The file saved in:%s',outputpath)
-        print('年龄计算完成！文件保存目录为：',outputpath)
+        
     except ValueError:
-        print('未找到“result_all.csv"文件 或数据格式不正确！请先完成<Pb校正计算>!')
+        
         tk.messagebox.showinfo(title='Information！', message='“result_all.csv" file not found or  Incorrect data format！')
         logging.critical('“result_all.csv" were not found or the format is incorrect.')  
     except NameError:
         
-        print('文件输出目录或标样未设置！')
+       
         tk.messagebox.showinfo(title='Information！', message='Output directory or standard  is not set！')
         logging.error('The output directory is not set.') 
     except OSError:
@@ -2374,9 +2362,7 @@ def main():
     global end_s
     global end_b
     multi=8
-    #bcg_from=3
-    #bcg_to=10
-    #multi=8
+
     global bcg
     bcg=[1,5,8]
     filename = open('bcg_inf.txt', 'w')
@@ -2406,7 +2392,7 @@ def main():
         global theLB
         outputpath=askdirectory(title=u'Select output folder',initialdir=(os.path.expanduser('H:/')))
         print('Save：',outputpath)
-        #print('<3>点击【读取数据】按钮，完成数据读取和初步检查工作！')
+        
         if outputpath is not None:
             path2.set(outputpath)
             
@@ -2435,9 +2421,7 @@ def main():
     helpmenu.add_command(label="About developer", command=developer)
     
 
-    #height=400
-    #width=650
-    #创建frame容器
+    
     frmTT=Frame(width=810, height=50,bg='#B0C4DE')
     frmLT = Frame(width=810, height=50,bg='#008080')
     frmLLT = Frame(width=810, height=50,bg='#D2691E')
@@ -2552,7 +2536,7 @@ def main():
     def choose_result3():
         global standard
         standard='91500'
-        Cal_age(1062)
+        Cal_age(1064.5)
        
         logging.info('Choose Titanite U-Pb Dating，use <91500> as standard !')
         return standard
@@ -2649,7 +2633,7 @@ def main():
 
         
  
-    #showButton=Button(frmLB,text='显示信号图',command=lambda :showplt(theLB.curselection()))
+ 
    
     
     path1=StringVar()
@@ -2693,14 +2677,13 @@ def main():
             
     
     plot_button=Button (frmLB, text = "Samples List",width=30)
-    #set_time_s = Button(frmRC, text='积分时间设置(单)',command=settime)
+   
    
             
     var_s=IntVar()
     cal_button=Button(frmRT, text = "Pb correction (All)", command = dataprocess)    
 
-    #plot_button=Button(frmLB,text='Samples List',width = 18)
-    #plot_button_all=Button(frmLB,text='绘制信号图(全)',command=drawsignalplt)  
+    
     set_time_all = Button(frmLB, text='Signal selection',width=20)
 
     #user set  background and sample during time.
@@ -2783,7 +2766,7 @@ def main():
     instrument2.grid(row=2,column=2,pady=10,padx=5)
     user_methodbutton.grid(row=1,column=0,padx=5,pady=10)
 
-    #list_button.grid(row=2,column=4,pady=0,padx=10)
+   
     Pb_deduction.grid(row=4,column=7,pady=10,padx=10)
 
 
@@ -2808,12 +2791,12 @@ def main():
     
     age.grid(row=4,column =5,pady=10,padx=10)
     age2.grid(row=4,column =6,pady=10,padx=10)
-    #showButton.grid(row =5, column =5,padx=5,pady=10)
+    
     l.grid(row =5, column =5,padx=5,pady=10)
     plot_button.grid(row =5,column = 0,columnspan=3,pady=10,padx=5)
-    #plot_button_all.grid(row =4,column = 1,pady=10,padx=5)
+   
     set_time_all.grid(row =5, column =3,columnspan=4,padx=5,pady=10)
-    #set_time_s.grid(row = 2, column =4,padx=10,pady=10)
+   
     def on_closing():
         if tk.messagebox.askokcancel("Quit", "Do you want to quit?"):
             
