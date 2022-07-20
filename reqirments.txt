@@ -1,0 +1,13 @@
+tkinter
+matplotlib
+warnings
+PIL
+logging
+csv
+json
+pandas
+numpy
+xlwt,xlrd
+scipy
+openpyxl
+
