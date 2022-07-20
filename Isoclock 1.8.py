@@ -1,7 +1,19 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Jul 19 18:20:11 2020
+Copyright 2022 Guoqi Liu
 
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
 @author: Guoqi Liu  642847452@qq.com  
 """
 
@@ -12,24 +24,7 @@ from tkinter import ttk
 import tkinter.messagebox
 import tkinter.simpledialog
 
-try:
-    splash=tk.Tk()
-    canvas=tk.Canvas(splash,width=640,height=400,highlightthickness=0)
-    x=int((splash.winfo_screenwidth()-600)/2)
-    #y=int((splash.winfo_screenheight()-splash.winfo_reqheight())/2)
-    y=int((splash.winfo_screenheight()-400)/2)
-    img=tk.PhotoImage(file='splash.png')
 
-    canvas.create_image(0,0,anchor=tk.NW,image=img)
-    canvas.pack()
-    splash.title=('Welcome!')
-    splash.geometry(f"640x400+{x}+{y}")
-    splash.overrideredirect(True)
-    splash.after(4000,lambda:splash.destroy())
-    tk.mainloop()
-except Exception:
-    splash.destroy()
-    pass
 from tkinter.filedialog import askdirectory
 import matplotlib.pyplot as plt
 import warnings
