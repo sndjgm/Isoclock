@@ -1013,7 +1013,7 @@ def samples_method(name,Hg202_b,Hg204_b,Pb206_b,Pb207_b,Pb208_b,Th232_b,U238_b,H
     
     if ele.get()==0:
         
-        No=int(name.split('_')[1].split('.')[0])
+        No=int(name.split('_')[-1].split('.')[0])
     else:
         
         No=name
@@ -1116,7 +1116,7 @@ def Std_method(name,Hg202_b,Hg204_b,Pb206_b,Pb207_b,Pb208_b,Th232_b,U238_b,Hg202
         corr_Pb207_206=np.nanmean(Pb207_Pb206_f)
         
         if ele.get()==0:
-            No=int(name.split('_')[1].split('.')[0])
+            No=int(name.split('_')[-1].split('.')[0])
         else:
             No=name
         result_std=[No,name,sampleslist[name],np.nanmean(Pb207_Pb206_f),\
