@@ -755,7 +755,7 @@ def dataprocess():
         for name in numn.keys():
             if numn[name][3]-numn[name][2]<0 or numn[name][4]-numn[name][2]<0:
                 fa.append(name)
-            elif numn[name][3]+3>numn[name][4]-3:
+            elif numn[name][3]+1>numn[name][4]-1:
                 numn[name][3]=numn[name][4]
                 numn[name][4]=numn[name][3]
             else:
@@ -1350,11 +1350,11 @@ def instructure0():
             except:
                 s0=30
                 s1=60
-            Diff=(s1-3)-(s0+3)
+            Diff=(s1-1)-(s0+1)
             if Diff>0:
-                num[name]=[Numbers,b0,b1,s0+3,s1-3]
+                num[name]=[Numbers,b0,b1,s0+1,s1-1]
                 
-            else:num[name]=[Numbers,b0,b1,s1+3,s0-3]      
+            else:num[name]=[Numbers,b0,b1,s1+1,s0-1]      
     
 
             np.save(outputpath+'//'+name+'_x',x)
@@ -1634,11 +1634,11 @@ def instructure1():
         except Exception as e:
             print(str(e))
             
-        Diff=(s1-3)-(s0+3)
+        Diff=(s1-1)-(s0+1)
         if Diff>0:
-            num[name]=[Numbers,b0,b1,s0+3,s1-3]
+            num[name]=[Numbers,b0,b1,s0+1,s1-1]
             
-        else:num[name]=[Numbers,b0,b1,s1+3,s0-3]      
+        else:num[name]=[Numbers,b0,b1,s1+1,s0-1]      
     
         
 
@@ -1903,11 +1903,11 @@ def instructure2():
             s1=float(ends[0])*abs(Timeinternal)
             s0=float(starts[0])*abs(Timeinternal)              
 
-        Diff=(s1-3)-(s0+3)
+        Diff=(s1-1)-(s0+1)
         if Diff>0:
-            num[name]=[Numbers,b0,b1,s0+3,s1-3]
+            num[name]=[Numbers,b0,b1,s0+1,s1-1]
             
-        else:num[name]=[Numbers,b0,b1,s1+3,s0-3]          
+        else:num[name]=[Numbers,b0,b1,s1+1,s0-1]          
     
         
         
