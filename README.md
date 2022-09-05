@@ -5,16 +5,28 @@ Isoclock is designed to deduct common Pb for common-Pb-bearing materials and cal
 
 
 I. Software operation procedures
+
 1.1 Start-up and functional block division
+
 The following steps 1.1.1-1.1.5 is run before Isoclock runs for the first time.
+
 1.1.1	Python 3.9 is necessary to run the code. Download from https://www.python.org/downloads/ and follow the installation.
+
 1.1.2 Download or clone this repository.
+
 1.1.3 Open terminal/cmd and navigate to the Isoclock folder.
+
  cd path/to/folder/ Isoclock
+
 1.1.4 Instal python libraries required for Isoclock.
+
 	pip install -r requirements.txt
+
 1.1.5 Run Isoclock from python.
+
 	python Isoclock.py
+
 If everything is already installed, follow only steps1.1.5. If you are Windows user, you can also run the Isoclock.exe directly.
+
 
 
