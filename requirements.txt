@@ -7,7 +7,10 @@ csv
 json
 pandas
 numpy
-xlwt,xlrd
+xlwt
+xlrd
 scipy
 openpyxl
+pyDes 
+
 
