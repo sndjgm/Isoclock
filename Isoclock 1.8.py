@@ -32,7 +32,7 @@ from PIL import Image,ImageTk
 import logging
 #import wmi
 import base64
-from pyDes import *
+
 import sys
 import re
 import csv
