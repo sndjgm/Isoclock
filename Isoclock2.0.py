@@ -2,7 +2,7 @@
 """
 Created on Sun Jul 19 18:20:11 2020
 
-@author: Guoqi Liu   sndjgm@foxmail.com
+@author: Guoqi Liu sndjgm@foxmail.com
 """
 
 #import MC_to_Agilent
@@ -3020,7 +3020,7 @@ def instructure2():
         np.save(outputpath+'//'+name+'_y5',y5)
         np.save(outputpath+'//'+name+'_y6',y6)
         np.save(outputpath+'//'+name+'_y7',y7)
-        sampleslist[name]=Sampleslist1[name.split('.')[0]]
+        sampleslist[name]=Sampleslist1[name]
         i=i+1
         n = n + 465 / scale
             # 以矩形的长度作为变量值更新
