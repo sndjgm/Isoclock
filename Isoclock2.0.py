@@ -2,7 +2,7 @@
 """
 Created on Sun Jul 19 18:20:11 2020
 
-@author: Guoqi Liu sndjgm@foxmail.com
+@author: 刘国奇
 """
 
 #import MC_to_Agilent
@@ -50,7 +50,7 @@ logging.basicConfig(filename='my.log', level=logging.INFO, format=LOG_FORMAT, da
 def SK2model(age):
         #Sk2_64=11.152  sk2_74=12.998  sk2_84=31.23   sk2_mu=9.74  sk2_kp=36.84
    Pbc_64=11.152+9.74*(exp(0.155125*3.7)-exp(0.155125*age/1000))
-   Pbc_74=12.998+(9.74/137.88)*(exp(0.98485*3.7)-exp(0.98485*age/1000))
+   Pbc_74=12.998+(9.74/137.818)*(exp(0.98485*3.7)-exp(0.98485*age/1000))
    Pbc_84=31.23+36.84*(exp(0.049475*3.7)-exp(0.049475*age/1000))
    Pbc_68=Pbc_64/Pbc_84
    Pbc_78=Pbc_74/Pbc_84
@@ -63,7 +63,7 @@ def Age76Pb(Rap76):
     N = 0
     if Rap76 > 0.0460455:
         Tm = (Tmax + Tmin) / 2
-        Rap = (exp(0.00098485 * Tm) - 1) / (exp(0.000155125 * Tm) - 1) / 137.88      
+        Rap = (exp(0.00098485 * Tm) - 1) / (exp(0.000155125 * Tm) - 1) / 137.818      
     
         
         while abs(Rap76 - Rap)>0.00005 and N <10:
@@ -71,8 +71,8 @@ def Age76Pb(Rap76):
             if Rap < Rap76:
                 Tmin = Tm
             else:Tmax = Tm
-            Rapi = (exp(0.00098485 * Tmin) - 1) / (exp(0.000155125 * Tmin) - 1) / 137.88
-            Raps = (exp(0.00098485 * Tmax) - 1) / (exp(0.000155125 * Tmax) - 1) / 137.88
+            Rapi = (exp(0.00098485 * Tmin) - 1) / (exp(0.000155125 * Tmin) - 1) / 137.818
+            Raps = (exp(0.00098485 * Tmax) - 1) / (exp(0.000155125 * Tmax) - 1) / 137.818
             Tm = Tmin + (Tmax - Tmin) * (Rap76 - Rapi) / (Raps - Rapi)
             Age76Pb = Tm            
             N = N + 1
@@ -256,6 +256,7 @@ def loaddata(name,isoname):
  
             
 def Age_Calculate_average():
+    excess_V=float(var5.get())/100
     logging.info("Average calculation method")
     global NIST_STD
     M1=tk.messagebox.askyesno(title = 'Are trace elements calculated?',message="Is it needed for elemental content calculation?")
@@ -269,6 +270,7 @@ def Age_Calculate_average():
     try:
         
         name=np.loadtxt(outputpath+'//'+'result_all.csv',dtype=str,delimiter=',',skiprows=1,usecols=(2))
+        Coments=np.load('Coments.npy',allow_pickle='True').item()
         for i in range(len(name)):
             name[i]=name[i].strip()
             
@@ -390,8 +392,8 @@ def Age_Calculate_average():
         try:
             result_cal_age=[]
             for i in range(len(date_all)):
-                w=(sqrt(pow((date_all[3][i]/result_cal_206Pb_238U[i]),2)+0.0009)*result_cal_206Pb_238U[i])/result_cal_206Pb_238U[i]*100
-                s=(sqrt(pow((date_all[5][i]/result_cal_207Pb_235U[i]),2)+0.0009)*result_cal_207Pb_235U[i])/result_cal_207Pb_235U[i]*100
+                w=(sqrt(pow((date_all[3][i]/result_cal_206Pb_238U[i]),2)+excess_V*excess_V)*result_cal_206Pb_238U[i])/result_cal_206Pb_238U[i]*100
+                s=(sqrt(pow((date_all[5][i]/result_cal_207Pb_235U[i]),2)+excess_V*excess_V)*result_cal_207Pb_235U[i])/result_cal_207Pb_235U[i]*100
                 o=(sqrt(pow((date_all[1][i]/result_cal_207Pb_206Pb[i]),2)+0.0001)*result_cal_207Pb_206Pb[i])/result_cal_207Pb_206Pb[i]*100
                 if (abs((w*w+s*s-o*o)/(2*w*s)))<w/s:
                     rho=abs((w*w+s*s-o*o)/(2*w*s))
@@ -406,26 +408,26 @@ def Age_Calculate_average():
                           result_cal_208Pb_206Pb[i],date_all[9][i],
                           result_cal_232Th_206Pb[i],date_all[11][i],result_cal_208Pb_204Pb[i],date_all[13][i],
                           '-------------',log(abs(date_all[2][i]*f206_238+1))/(0.000000000155125)/1000000,\
-                          (sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+0.0009))*(log(abs(date_all[2][i]*f206_238+1))/(0.000000000155125)/1000000),\
+                          (sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+excess_V*excess_V))*(log(abs(date_all[2][i]*f206_238+1))/(0.000000000155125)/1000000),\
                           log(abs(result_cal_207Pb_235U[i]+1))/(0.00000000098485)/1000000,\
-                          (sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+0.0009))*(log(abs(result_cal_207Pb_235U[i]+1))/(0.00000000098485)/1000000),\
+                          (sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+excess_V*excess_V))*(log(abs(result_cal_207Pb_235U[i]+1))/(0.00000000098485)/1000000),\
                           log(abs(result_cal_208Pb_232Th[i]+1))/(0.000000000049475)/1000000,\
-                          (sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+0.0009))*(log(abs(result_cal_208Pb_232Th[i]+1))/(0.000000000049475)/1000000),\
+                          (sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+excess_V*excess_V))*(log(abs(result_cal_208Pb_232Th[i]+1))/(0.000000000049475)/1000000),\
                            Age76Pb(result_cal_207Pb_206Pb[i]),Age76Pb(result_cal_207Pb_206Pb[i]+date_all[1][i])-Age76Pb(result_cal_207Pb_206Pb[i]),
-                          '------------',' ',' ',' ',' ','------------',(1/(date_all[2][i]*f206_238)),(1/(date_all[2][i]*f206_238))*sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+0.0009),\
+                          Coments[(File_name[i])],' ',' ',' ',' ','------------',(1/(date_all[2][i]*f206_238)),(1/(date_all[2][i]*f206_238))*sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+excess_V*excess_V),\
                               result_cal_207Pb_206Pb[i],date_all[1][i],'-------------',result_cal_207Pb_235U[i],\
-                          (sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+0.0009))*result_cal_207Pb_235U[i],\
-                          result_cal_206Pb_238U[i],sqrt(pow((date_all[3][i]/result_cal_206Pb_238U[i]),2)+0.0009)*result_cal_206Pb_238U[i],rho,\
+                          (sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+excess_V*excess_V))*result_cal_207Pb_235U[i],\
+                          result_cal_206Pb_238U[i],sqrt(pow((date_all[3][i]/result_cal_206Pb_238U[i]),2)+excess_V*excess_V)*result_cal_206Pb_238U[i],rho,\
                               '-------------',result_cal_208Pb_232Th[i],\
-                          sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+0.0009)*result_cal_208Pb_232Th[i],\
+                          sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+excess_V*excess_V)*result_cal_208Pb_232Th[i],\
                           result_cal_208Pb_206Pb[i],date_all[9][i],'-------------',abs(date_all[14][i]*coefficient_U),\
                           date_all[15][i]*coefficient_Th,(date_all[16][i]+date_all[17][i]+date_all[18][i])*coefficient_Pb,'','','','','','']
                     result_cal_age.append(s002)
                 elif PbCorrS.get()==1:
-                    Corr_7_5_age=log(abs(result_cal_207Pb_235U[i]-((result_cal_207Pb_206Pb[i]-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*common_Pb*137.88*date_all[2][i]*f206_238+1))/0.00000000098485/1000000
-                    Corr_7_5_age_erro=(log(abs(result_cal_207Pb_235U[i]-((result_cal_207Pb_206Pb[i]-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*common_Pb*137.88*date_all[2][i]*f206_238+1))/0.00000000098485/1000000)*((sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+0.0009)))
+                    Corr_7_5_age=log(abs(result_cal_207Pb_235U[i]-((result_cal_207Pb_206Pb[i]-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*common_Pb*137.818*date_all[2][i]*f206_238+1))/0.00000000098485/1000000
+                    Corr_7_5_age_erro=(log(abs(result_cal_207Pb_235U[i]-((result_cal_207Pb_206Pb[i]-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*common_Pb*137.818*date_all[2][i]*f206_238+1))/0.00000000098485/1000000)*((sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+excess_V*excess_V)))
                     Corr_6_8_age=(log(abs((1-(result_cal_207Pb_206Pb[i]-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*date_all[2][i]*f206_238)+1)/0.000000000155125)/1000000
-                    Corr_6_8_age_erro=((log(abs((1-(result_cal_207Pb_206Pb[i]-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*date_all[2][i]*f206_238)+1)/0.000000000155125)/1000000)*((sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+0.0009)))
+                    Corr_6_8_age_erro=((log(abs((1-(result_cal_207Pb_206Pb[i]-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*date_all[2][i]*f206_238)+1)/0.000000000155125)/1000000)*((sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+excess_V*excess_V)))
                     
                     
                     
@@ -438,18 +440,18 @@ def Age_Calculate_average():
                           result_cal_208Pb_206Pb[i],date_all[9][i],
                           result_cal_232Th_206Pb[i],date_all[11][i],result_cal_208Pb_204Pb[i],date_all[13][i],
                           '-------------',log(abs(date_all[2][i]*f206_238+1))/(0.000000000155125)/1000000,\
-                          (sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+0.0009))*(log(abs(date_all[2][i]*f206_238+1))/(0.000000000155125)/1000000),\
+                          (sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+excess_V*excess_V))*(log(abs(date_all[2][i]*f206_238+1))/(0.000000000155125)/1000000),\
                           log(abs(result_cal_207Pb_235U[i]+1))/(0.00000000098485)/1000000,\
-                          (sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+0.0009))*(log(abs(result_cal_207Pb_235U[i]+1))/(0.00000000098485)/1000000),\
+                          (sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+excess_V*excess_V))*(log(abs(result_cal_207Pb_235U[i]+1))/(0.00000000098485)/1000000),\
                           log(abs(result_cal_208Pb_232Th[i]+1))/(0.000000000049475)/1000000,\
-                          (sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+0.0009))*(log(abs(result_cal_208Pb_232Th[i]+1))/(0.000000000049475)/1000000),\
+                          (sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+excess_V*excess_V))*(log(abs(result_cal_208Pb_232Th[i]+1))/(0.000000000049475)/1000000),\
                            Age76Pb(result_cal_207Pb_206Pb[i]),Age76Pb(result_cal_207Pb_206Pb[i]+date_all[1][i])-Age76Pb(result_cal_207Pb_206Pb[i]),\
-                            '------------',Corr_7_5_age,Corr_7_5_age_erro,Corr_6_8_age,Corr_6_8_age_erro,'------------',(1/(date_all[2][i]*f206_238)),(1/(date_all[2][i]*f206_238))*sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+0.0009),\
+                            Coments[(File_name[i])],Corr_7_5_age,Corr_7_5_age_erro,Corr_6_8_age,Corr_6_8_age_erro,'------------',(1/(date_all[2][i]*f206_238)),(1/(date_all[2][i]*f206_238))*sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+excess_V*excess_V),\
                               result_cal_207Pb_206Pb[i],date_all[1][i],'-------------',result_cal_207Pb_235U[i],\
-                          (sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+0.0009))*result_cal_207Pb_235U[i],\
-                          result_cal_206Pb_238U[i],sqrt(pow((date_all[3][i]/result_cal_206Pb_238U[i]),2)+0.0009)*result_cal_206Pb_238U[i],rho,\
+                          (sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+excess_V*excess_V))*result_cal_207Pb_235U[i],\
+                          result_cal_206Pb_238U[i],sqrt(pow((date_all[3][i]/result_cal_206Pb_238U[i]),2)+excess_V*excess_V)*result_cal_206Pb_238U[i],rho,\
                               '-------------',result_cal_208Pb_232Th[i],\
-                          sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+0.0009)*result_cal_208Pb_232Th[i],\
+                          sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+excess_V*excess_V)*result_cal_208Pb_232Th[i],\
                           result_cal_208Pb_206Pb[i],date_all[9][i],'-------------',abs(date_all[14][i]*coefficient_U),\
                           date_all[15][i]*coefficient_Th,(date_all[16][i]+date_all[17][i]+date_all[18][i])*coefficient_Pb,'----',Corr_7_5,Corr_7_5_erro,Corr_6_8,Corr_6_8_erro,rho]
                     result_cal_age.append(s002)
@@ -457,9 +459,9 @@ def Age_Calculate_average():
     
                 elif PbCorrS.get()==2:
                     #Corr_7_5_age=log(abs(result_cal_207Pb_235U[i]*(result_cal_207Pb_206Pb[i]/result_cal_208Pb_206Pb[i]-common_Pb207_208)/(result_cal_207Pb_206Pb[i]/result_cal_208Pb_206Pb[i])+1))/(0.00000000098485)/1000000
-                    #Corr_7_5_age_erro=(log(abs(result_cal_207Pb_235U[i]*(result_cal_207Pb_206Pb[i]/result_cal_208Pb_206Pb[i]-common_Pb207_208)/(result_cal_207Pb_206Pb[i]/result_cal_208Pb_206Pb[i])+1))/(0.00000000098485)/1000000)*((sqrt(pow((date_all[5][i]/result_cal_207Pb_235U[i]),2)+0.0009)*result_cal_207Pb_235U[i])/result_cal_207Pb_235U[i]*100)/100
+                    #Corr_7_5_age_erro=(log(abs(result_cal_207Pb_235U[i]*(result_cal_207Pb_206Pb[i]/result_cal_208Pb_206Pb[i]-common_Pb207_208)/(result_cal_207Pb_206Pb[i]/result_cal_208Pb_206Pb[i])+1))/(0.00000000098485)/1000000)*((sqrt(pow((date_all[5][i]/result_cal_207Pb_235U[i]),2)+excess_V*excess_V)*result_cal_207Pb_235U[i])/result_cal_207Pb_235U[i]*100)/100
                     #Corr_6_8_age=log(abs(date_all[2][i]*f206_238*(1/result_cal_208Pb_206Pb[i]-common_Pb206_208)/(1/result_cal_208Pb_206Pb[i])+1))/(0.000000000155125)/1000000
-                    #Corr_6_8_age_erro= (log(abs(date_all[2][i]*f206_238*(1/result_cal_208Pb_206Pb[i]-common_Pb206_208)/(1/result_cal_208Pb_206Pb[i])+1))/(0.000000000155125)/1000000)*((sqrt(pow((date_all[3][i]/date_all[2][i]*f206_238),2)+0.0009)*date_all[2][i]*f206_238)/date_all[2][i]*f206_238*100)/100
+                    #Corr_6_8_age_erro= (log(abs(date_all[2][i]*f206_238*(1/result_cal_208Pb_206Pb[i]-common_Pb206_208)/(1/result_cal_208Pb_206Pb[i])+1))/(0.000000000155125)/1000000)*((sqrt(pow((date_all[3][i]/date_all[2][i]*f206_238),2)+excess_V*excess_V)*date_all[2][i]*f206_238)/date_all[2][i]*f206_238*100)/100
     
                         
                         
@@ -489,7 +491,7 @@ def Age_Calculate_average():
                         Corr_6_8_age_erro=0
                     else:
                                                 
-                        Corr_7_5=f207_235*137.88*Corr_207/(date_cps[i][13]-date_cps[i][6])
+                        Corr_7_5=f207_235*137.818*Corr_207/(date_cps[i][13]-date_cps[i][6])
                         Corr_6_8=f206_238*Corr_206/(date_cps[i][13]-date_cps[i][6])
                     
                         erroC208_6=sqrt((date_cps[i][4]/(date_cps[i][11]-date_cps[i][4]))**2+0.0004)
@@ -530,7 +532,7 @@ def Age_Calculate_average():
                     
                     
                     
-                    #Corr_7_5=f207_235*abs(date_all[4][i]-date_all[2][i]*137.88*date_all[8][i]*SK2model(age)[4])
+                    #Corr_7_5=f207_235*abs(date_all[4][i]-date_all[2][i]*137.818*date_all[8][i]*SK2model(age)[4])
                     #Corr_7_5_erro1=((sqrt(pow((date_all[5][i]/result_cal_207Pb_235U[i]),2)+0.0004)*result_cal_207Pb_235U[i])/result_cal_207Pb_235U[i]*100)/100
                     #Corr_7_5_erro=sqrt(Corr_7_5_erro1**2+std_75_2s**2)*Corr_7_5
                     #Corr_6_8=f206_238*abs(date_all[2][i]-date_all[8][i]*date_all[2][i]*SK2model(age)[3])
@@ -546,28 +548,28 @@ def Age_Calculate_average():
                           result_cal_208Pb_206Pb[i],date_all[9][i],
                           result_cal_232Th_206Pb[i],date_all[11][i],result_cal_208Pb_204Pb[i],date_all[13][i],
                           '-------------',log(abs(date_all[2][i]*f206_238+1))/(0.000000000155125)/1000000,\
-                          (sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+0.0009))*(log(abs(date_all[2][i]*f206_238+1))/(0.000000000155125)/1000000),\
+                          (sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+excess_V*excess_V))*(log(abs(date_all[2][i]*f206_238+1))/(0.000000000155125)/1000000),\
                           log(abs(result_cal_207Pb_235U[i]+1))/(0.00000000098485)/1000000,\
-                          (sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+0.0009))*(log(abs(result_cal_207Pb_235U[i]+1))/(0.00000000098485)/1000000),\
+                          (sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+excess_V*excess_V))*(log(abs(result_cal_207Pb_235U[i]+1))/(0.00000000098485)/1000000),\
                           log(abs(result_cal_208Pb_232Th[i]+1))/(0.000000000049475)/1000000,\
-                          (sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+0.0009))*(log(abs(result_cal_208Pb_232Th[i]+1))/(0.000000000049475)/1000000),\
+                          (sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+excess_V*excess_V))*(log(abs(result_cal_208Pb_232Th[i]+1))/(0.000000000049475)/1000000),\
                            Age76Pb(result_cal_207Pb_206Pb[i]),Age76Pb(result_cal_207Pb_206Pb[i]+date_all[1][i])-Age76Pb(result_cal_207Pb_206Pb[i]),
-                          '------------',Corr_7_5_age,Corr_7_5_age_erro,Corr_6_8_age,Corr_6_8_age_erro,'------------',
-                                              (1/(date_all[2][i]*f206_238)),(1/(date_all[2][i]*f206_238))*sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+0.0009),\
+                          Coments[(File_name[i])],Corr_7_5_age,Corr_7_5_age_erro,Corr_6_8_age,Corr_6_8_age_erro,'------------',
+                                              (1/(date_all[2][i]*f206_238)),(1/(date_all[2][i]*f206_238))*sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+excess_V*excess_V),\
                                                   result_cal_207Pb_206Pb[i],date_all[1][i],'-------------',result_cal_207Pb_235U[i],\
-                                              (sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+0.0009))*result_cal_207Pb_235U[i],\
-                                              result_cal_206Pb_238U[i],sqrt(pow((date_all[3][i]/result_cal_206Pb_238U[i]),2)+0.0009)*result_cal_206Pb_238U[i],rho,\
+                                              (sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+excess_V*excess_V))*result_cal_207Pb_235U[i],\
+                                              result_cal_206Pb_238U[i],sqrt(pow((date_all[3][i]/result_cal_206Pb_238U[i]),2)+excess_V*excess_V)*result_cal_206Pb_238U[i],rho,\
                                                   '-------------',result_cal_208Pb_232Th[i],\
-                                              sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+0.0009)*result_cal_208Pb_232Th[i],\
+                                              sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+excess_V*excess_V)*result_cal_208Pb_232Th[i],\
                                               result_cal_208Pb_206Pb[i],date_all[9][i],'-------------',abs(date_all[14][i]*coefficient_U),\
                                               date_all[15][i]*coefficient_Th,(date_all[16][i]+date_all[17][i]+date_all[18][i])*coefficient_Pb,'----',Corr_7_5,Corr_7_5_erro,Corr_6_8,Corr_6_8_erro,rho]
                     result_cal_age.append(s002)
                 elif PbCorrS.get()==3:
                     
                     #Corr_7_5_age=log(abs(result_cal_207Pb_235U[i]*(result_cal_207Pb_206Pb[i]*result_cal_208Pb_204Pb[i]/result_cal_208Pb_206Pb[i]-common_Pb207_204)/(result_cal_207Pb_206Pb[i]*result_cal_208Pb_204Pb[i]/result_cal_208Pb_206Pb[i])+1))/(0.00000000098485)/1000000
-                    #Corr_7_5_age_erro=(log(abs(result_cal_207Pb_235U[i]*(result_cal_207Pb_206Pb[i]*result_cal_208Pb_204Pb[i]/result_cal_208Pb_206Pb[i]-common_Pb207_204)/(result_cal_207Pb_206Pb[i]*result_cal_208Pb_204Pb[i]/result_cal_208Pb_206Pb[i])+1))/(0.00000000098485)/1000000)*((sqrt(pow((date_all[5][i]/result_cal_207Pb_235U[i]),2)+0.0009)*result_cal_207Pb_235U[i])/result_cal_207Pb_235U[i]*100)/100
+                    #Corr_7_5_age_erro=(log(abs(result_cal_207Pb_235U[i]*(result_cal_207Pb_206Pb[i]*result_cal_208Pb_204Pb[i]/result_cal_208Pb_206Pb[i]-common_Pb207_204)/(result_cal_207Pb_206Pb[i]*result_cal_208Pb_204Pb[i]/result_cal_208Pb_206Pb[i])+1))/(0.00000000098485)/1000000)*((sqrt(pow((date_all[5][i]/result_cal_207Pb_235U[i]),2)+excess_V*excess_V)*result_cal_207Pb_235U[i])/result_cal_207Pb_235U[i]*100)/100
                     #Corr_6_8_age=log(abs(date_all[2][i]*f206_238*(result_cal_208Pb_204Pb[i]/result_cal_208Pb_206Pb[i]-common_Pb206_204)/(result_cal_208Pb_204Pb[i]/result_cal_208Pb_206Pb[i])+1))/(0.000000000155125)/1000000
-                    #Corr_6_8_age_erro= (log(abs(date_all[2][i]*f206_238*(result_cal_208Pb_204Pb[i]/result_cal_208Pb_206Pb[i]-common_Pb206_204)/(result_cal_208Pb_204Pb[i]/result_cal_208Pb_206Pb[i])+1))/(0.000000000155125)/1000000)*((sqrt(pow((date_all[3][i]/date_all[2][i]*f206_238),2)+0.0009)*date_all[2][i]*f206_238)/date_all[2][i]*f206_238*100)/100
+                    #Corr_6_8_age_erro= (log(abs(date_all[2][i]*f206_238*(result_cal_208Pb_204Pb[i]/result_cal_208Pb_206Pb[i]-common_Pb206_204)/(result_cal_208Pb_204Pb[i]/result_cal_208Pb_206Pb[i])+1))/(0.000000000155125)/1000000)*((sqrt(pow((date_all[3][i]/date_all[2][i]*f206_238),2)+excess_V*excess_V)*date_all[2][i]*f206_238)/date_all[2][i]*f206_238*100)/100
                     
                     Corr_207=(date_cps[i][10]-date_cps[i][3])-(date_cps[i][8]-date_cps[i][1])*(SK2model(age)[1])
                     Corr_206=(date_cps[i][9]-date_cps[i][2])-(date_cps[i][8]-date_cps[i][1])*(SK2model(age)[0])
@@ -586,7 +588,7 @@ def Age_Calculate_average():
                         Corr_6_8_age_erro=0
                     else:
                                                 
-                        Corr_7_5=f207_235*137.88*Corr_207/(date_cps[i][13]-date_cps[i][6])
+                        Corr_7_5=f207_235*137.818*Corr_207/(date_cps[i][13]-date_cps[i][6])
                         Corr_6_8=f206_238*Corr_206/(date_cps[i][13]-date_cps[i][6])
                     
                         erroC204_6=sqrt((date_cps[i][1]/(date_cps[i][8]-date_cps[i][1]))**2+0.0004)
@@ -639,18 +641,18 @@ def Age_Calculate_average():
                           result_cal_208Pb_206Pb[i],date_all[9][i],
                           result_cal_232Th_206Pb[i],date_all[11][i],result_cal_208Pb_204Pb[i],date_all[13][i],
                           '-------------',log(abs(date_all[2][i]*f206_238+1))/(0.000000000155125)/1000000,\
-                          (sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+0.0009))*(log(abs(date_all[2][i]*f206_238+1))/(0.000000000155125)/1000000),\
+                          (sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+excess_V*excess_V))*(log(abs(date_all[2][i]*f206_238+1))/(0.000000000155125)/1000000),\
                           log(abs(result_cal_207Pb_235U[i]+1))/(0.00000000098485)/1000000,\
-                          (sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+0.0009))*(log(abs(result_cal_207Pb_235U[i]+1))/(0.00000000098485)/1000000),\
+                          (sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+excess_V*excess_V))*(log(abs(result_cal_207Pb_235U[i]+1))/(0.00000000098485)/1000000),\
                           log(abs(result_cal_208Pb_232Th[i]+1))/(0.000000000049475)/1000000,\
-                          (sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+0.0009))*(log(abs(result_cal_208Pb_232Th[i]+1))/(0.000000000049475)/1000000),\
+                          (sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+excess_V*excess_V))*(log(abs(result_cal_208Pb_232Th[i]+1))/(0.000000000049475)/1000000),\
                            Age76Pb(result_cal_207Pb_206Pb[i]),Age76Pb(result_cal_207Pb_206Pb[i]+date_all[1][i])-Age76Pb(result_cal_207Pb_206Pb[i]),\
-                          '------------',Corr_7_5_age,Corr_7_5_age_erro,Corr_6_8_age,Corr_6_8_age_erro,'------------',(1/(date_all[2][i]*f206_238)),(1/(date_all[2][i]*f206_238))*sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+0.0009),\
+                          Coments[(File_name[i])],Corr_7_5_age,Corr_7_5_age_erro,Corr_6_8_age,Corr_6_8_age_erro,'------------',(1/(date_all[2][i]*f206_238)),(1/(date_all[2][i]*f206_238))*sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+excess_V*excess_V),\
                                                   result_cal_207Pb_206Pb[i],date_all[1][i],'-------------',result_cal_207Pb_235U[i],\
-                                              (sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+0.0009))*result_cal_207Pb_235U[i],\
-                                              result_cal_206Pb_238U[i],sqrt(pow((date_all[3][i]/result_cal_206Pb_238U[i]),2)+0.0009)*result_cal_206Pb_238U[i],rho,\
+                                              (sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+excess_V*excess_V))*result_cal_207Pb_235U[i],\
+                                              result_cal_206Pb_238U[i],sqrt(pow((date_all[3][i]/result_cal_206Pb_238U[i]),2)+excess_V*excess_V)*result_cal_206Pb_238U[i],rho,\
                                                   '-------------',result_cal_208Pb_232Th[i],\
-                                              sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+0.0009)*result_cal_208Pb_232Th[i],\
+                                              sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+excess_V*excess_V)*result_cal_208Pb_232Th[i],\
                                               result_cal_208Pb_206Pb[i],date_all[9][i],'-------------',abs(date_all[14][i]*coefficient_U),\
                                               date_all[15][i]*coefficient_Th,(date_all[16][i]+date_all[17][i]+date_all[18][i])*coefficient_Pb,'----',Corr_7_5,Corr_7_5_erro,Corr_6_8,Corr_6_8_erro,rho]
                     result_cal_age.append(s002)
@@ -663,10 +665,10 @@ def Age_Calculate_average():
                     Cal204Pb=abs((date_all[17][i]-date_all[18][i]*radioactiveS_Pb207_206)/(common_Pb207_204-common_Pb206_204*radioactiveS_Pb207_206))
                     
                     Corr_6_8_age=log(abs(f206_238*(date_all[18][i]-Cal204Pb*common_Pb206_204)/date_all[14][i]+1))/(0.000000000155125)/1000000
-                    Corr_6_8_age_erro=(log(abs(f206_238*(date_all[18][i]-Cal204Pb*common_Pb206_204)/date_all[14][i]+1))/(0.000000000155125)/1000000)*(sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+0.0009))
+                    Corr_6_8_age_erro=(log(abs(f206_238*(date_all[18][i]-Cal204Pb*common_Pb206_204)/date_all[14][i]+1))/(0.000000000155125)/1000000)*(sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+excess_V*excess_V))
                     
-                    Corr_7_5_age=log(abs(f207_235*(date_all[17][i]-Cal204Pb*common_Pb207_204)/date_all[14][i]/137.88+1))/(0.00000000098485)/1000000
-                    Corr_7_5_age_erro=(log(abs(f207_235*(date_all[17][i]-Cal204Pb*common_Pb207_204)/date_all[14][i]/137.88+1))/(0.00000000098485)/1000000)*((sqrt(pow((date_all[5][i]/result_cal_207Pb_235U[i]),2)+0.0009)))
+                    Corr_7_5_age=log(abs(f207_235*(date_all[17][i]-Cal204Pb*common_Pb207_204)/date_all[14][i]/137.818+1))/(0.00000000098485)/1000000
+                    Corr_7_5_age_erro=(log(abs(f207_235*(date_all[17][i]-Cal204Pb*common_Pb207_204)/date_all[14][i]/137.818+1))/(0.00000000098485)/1000000)*((sqrt(pow((date_all[5][i]/result_cal_207Pb_235U[i]),2)+excess_V*excess_V)))
                     
                     
                     
@@ -674,7 +676,7 @@ def Age_Calculate_average():
                     
                     
                     Corr_8_2_age=log(abs(f208_232*(date_all[16][i]-common_Pb208_204*Cal204Pb)/date_all[15][i]+1))/(0.000000000049475)/1000000
-                    Corr_8_2_age_erro=(log(abs(f208_232*(date_all[16][i]-common_Pb208_204*Cal204Pb)/date_all[15][i]+1))/(0.000000000049475)/1000000)*((sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+0.0009)))
+                    Corr_8_2_age_erro=(log(abs(f208_232*(date_all[16][i]-common_Pb208_204*Cal204Pb)/date_all[15][i]+1))/(0.000000000049475)/1000000)*((sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+excess_V*excess_V)))
                     
                     Corr_8_2=exp(0.000000000049475*Corr_8_2_age*1000000)-1
                     Corr_8_2_erro=Corr_8_2*Corr_8_2_age_erro/Corr_8_2_age
@@ -689,18 +691,18 @@ def Age_Calculate_average():
                           result_cal_208Pb_206Pb[i],date_all[9][i],
                           result_cal_232Th_206Pb[i],date_all[11][i],result_cal_208Pb_204Pb[i],date_all[13][i],
                           '-------------',log(abs(date_all[2][i]*f206_238+1))/(0.000000000155125)/1000000,\
-                          (sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+0.0009))*(log(abs(date_all[2][i]*f206_238+1))/(0.000000000155125)/1000000),\
+                          (sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+excess_V*excess_V))*(log(abs(date_all[2][i]*f206_238+1))/(0.000000000155125)/1000000),\
                           log(abs(result_cal_207Pb_235U[i]+1))/(0.00000000098485)/1000000,\
-                          (sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+0.0009))*(log(abs(result_cal_207Pb_235U[i]+1))/(0.00000000098485)/1000000),\
+                          (sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+excess_V*excess_V))*(log(abs(result_cal_207Pb_235U[i]+1))/(0.00000000098485)/1000000),\
                           log(abs(result_cal_208Pb_232Th[i]+1))/(0.000000000049475)/1000000,\
-                          (sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+0.0009))*(log(abs(result_cal_208Pb_232Th[i]+1))/(0.000000000049475)/1000000),\
+                          (sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+excess_V*excess_V))*(log(abs(result_cal_208Pb_232Th[i]+1))/(0.000000000049475)/1000000),\
                            Age76Pb(result_cal_207Pb_206Pb[i]),Age76Pb(result_cal_207Pb_206Pb[i]+date_all[1][i])-Age76Pb(result_cal_207Pb_206Pb[i]),\
-                            '------------',Corr_6_8_age,Corr_6_8_age_erro,Corr_8_2_age,Corr_8_2_age_erro,'------------',(1/(date_all[2][i]*f206_238)),(1/(date_all[2][i]*f206_238))*sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+0.0009),\
+                            Coments[(File_name[i])],Corr_6_8_age,Corr_6_8_age_erro,Corr_8_2_age,Corr_8_2_age_erro,'------------',(1/(date_all[2][i]*f206_238)),(1/(date_all[2][i]*f206_238))*sqrt(pow(date_all[3][i]/(date_all[2][i]*f206_238),2)+excess_V*excess_V),\
                               result_cal_207Pb_206Pb[i],date_all[1][i],'-------------',result_cal_207Pb_235U[i],\
-                          (sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+0.0009))*result_cal_207Pb_235U[i],\
-                          result_cal_206Pb_238U[i],sqrt(pow((date_all[3][i]/result_cal_206Pb_238U[i]),2)+0.0009)*result_cal_206Pb_238U[i],rho,\
+                          (sqrt(pow(date_all[5][i]/result_cal_207Pb_235U[i],2)+excess_V*excess_V))*result_cal_207Pb_235U[i],\
+                          result_cal_206Pb_238U[i],sqrt(pow((date_all[3][i]/result_cal_206Pb_238U[i]),2)+excess_V*excess_V)*result_cal_206Pb_238U[i],rho,\
                               '-------------',result_cal_208Pb_232Th[i],\
-                          sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+0.0009)*result_cal_208Pb_232Th[i],\
+                          sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th[i],2)+excess_V*excess_V)*result_cal_208Pb_232Th[i],\
                           result_cal_208Pb_206Pb[i],date_all[9][i],'-------------',abs(date_all[14][i]*coefficient_U),\
                           date_all[15][i]*coefficient_Th,(date_all[16][i]+date_all[17][i]+date_all[18][i])*coefficient_Pb,'----','','','','','']
                     result_cal_age.append(s002)
@@ -863,7 +865,7 @@ def Age_Calculate_average():
         
 def Age_Calculate():
     logging.info("Linear calculation method")
-    
+    excess_V=float(var5.get())/100
     
     global NIST_STD
     M1=tk.messagebox.askyesno(title = 'Are trace elements calculated?',message="Is it needed for elemental content calculation?")
@@ -883,10 +885,13 @@ def Age_Calculate():
     
     try:
         name=np.loadtxt(outputpath+'//'+'result_all.csv',dtype=str,delimiter=',',skiprows=1,usecols=(2))
+        Coments=np.load('Coments.npy',allow_pickle='True').item()
         for i in range(len(name)):
             name[i]=name[i].strip()
         Fname=np.loadtxt(outputpath+'//'+'result_all.csv',dtype=str,delimiter=',',skiprows=1,usecols=(1))
         File_name=Fname.tolist()
+        
+        
         ssf=name.tolist()
         date=np.loadtxt(outputpath+'//'+'result_all.csv',delimiter=',',skiprows=1,usecols=(3,4,5,6,7,8,9,10,11,12,13,14,15,16,18,19,20,21,22))
         
@@ -1019,8 +1024,8 @@ def Age_Calculate():
                     result_cal_232Th_206Pb=date_all[10][i]*(w_1/n)*f232_206B+date_all[10][i]*(1-(w_1/n))*f232_206A
                     result_cal_208Pb_204Pb=date_all[12][i]*(w_1/n)*f208_204B+date_all[12][i]*(1-(w_1/n))*f208_204A
                     
-                    w=(sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+0.0009)*result_cal_206Pb_238U)/result_cal_206Pb_238U*100
-                    s=(sqrt(pow((date_all[5][i]/result_cal_207Pb_235U),2)+0.0009)*result_cal_207Pb_235U)/result_cal_207Pb_235U*100
+                    w=(sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+excess_V*excess_V)*result_cal_206Pb_238U)/result_cal_206Pb_238U*100
+                    s=(sqrt(pow((date_all[5][i]/result_cal_207Pb_235U),2)+excess_V*excess_V)*result_cal_207Pb_235U)/result_cal_207Pb_235U*100
                     o=(sqrt(pow((date_all[1][i]/result_cal_207Pb_206Pb),2)+0.0001)*result_cal_207Pb_206Pb)/result_cal_207Pb_206Pb*100
                     if (abs((w*w+s*s-o*o)/(2*w*s)))<w/s:
                         rho=abs((w*w+s*s-o*o)/(2*w*s))
@@ -1029,23 +1034,24 @@ def Age_Calculate():
                         
                     
                     if PbCorrS.get()==0:
+                        
                         s002=[File_name[i],ssf[i],result_cal_207Pb_206Pb,date_all[1][i],result_cal_206Pb_238U,date_all[3][i],result_cal_207Pb_235U,date_all[5][i],result_cal_208Pb_232Th,date_all[7][i],\
                               result_cal_208Pb_206Pb,date_all[9][i],
                               result_cal_232Th_206Pb,date_all[11][i],result_cal_208Pb_204Pb,date_all[13][i],
-                              '-------------',log(abs(result_cal_206Pb_238U+1))/(0.000000000155125)/1000000,(sqrt(pow(date_all[3][i]/result_cal_206Pb_238U,2)+0.0009))*(log(abs(result_cal_206Pb_238U+1))/(0.000000000155125)/1000000),\
-                              log(abs(result_cal_207Pb_235U+1))/(0.00000000098485)/1000000,(sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+0.0009))*(log(abs(result_cal_207Pb_235U+1))/(0.00000000098485)/1000000),\
-                              log(abs(result_cal_208Pb_232Th+1))/(0.000000000049475)/1000000,(sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th,2)+0.0009))*(log(abs(result_cal_208Pb_232Th+1))/(0.000000000049475)/1000000),\
+                              '------------',log(abs(result_cal_206Pb_238U+1))/(0.000000000155125)/1000000,(sqrt(pow(date_all[3][i]/result_cal_206Pb_238U,2)+excess_V*excess_V))*(log(abs(result_cal_206Pb_238U+1))/(0.000000000155125)/1000000),\
+                              log(abs(result_cal_207Pb_235U+1))/(0.00000000098485)/1000000,(sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+excess_V*excess_V))*(log(abs(result_cal_207Pb_235U+1))/(0.00000000098485)/1000000),\
+                              log(abs(result_cal_208Pb_232Th+1))/(0.000000000049475)/1000000,(sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th,2)+excess_V*excess_V))*(log(abs(result_cal_208Pb_232Th+1))/(0.000000000049475)/1000000),\
                               Age76Pb(result_cal_207Pb_206Pb),Age76Pb(result_cal_207Pb_206Pb+date_all[1][i])-Age76Pb(result_cal_207Pb_206Pb),
-                              '------------','None','None','None','None','------------',1/result_cal_206Pb_238U,(1/result_cal_206Pb_238U)*(sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+0.0009)*result_cal_206Pb_238U)/result_cal_206Pb_238U,\
-                              result_cal_207Pb_206Pb,date_all[1][i],'------------',result_cal_207Pb_235U,result_cal_207Pb_235U*sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+0.0009),result_cal_206Pb_238U,sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+0.0009)*result_cal_206Pb_238U,\
+                              Coments[(File_name[i])],'None','None','None','None','------------',1/result_cal_206Pb_238U,(1/result_cal_206Pb_238U)*(sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+excess_V*excess_V)*result_cal_206Pb_238U)/result_cal_206Pb_238U,\
+                              result_cal_207Pb_206Pb,date_all[1][i],'------------',result_cal_207Pb_235U,result_cal_207Pb_235U*sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+excess_V*excess_V),result_cal_206Pb_238U,sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+excess_V*excess_V)*result_cal_206Pb_238U,\
                               rho,'------------',result_cal_208Pb_232Th,date_all[7][i],result_cal_208Pb_206Pb,date_all[9][i],'       ',abs(date_all[14][i]*coefficient_U),\
                           date_all[15][i]*coefficient_Th,(date_all[16][i]+date_all[17][i]+date_all[18][i])*coefficient_Pb,'','','','','','']
                         result_cal_age.append(s002)
                     elif PbCorrS.get()==1:
-                        Corr_7_5_age=log(abs(result_cal_207Pb_235U-((result_cal_207Pb_206Pb-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*common_Pb*137.88*result_cal_206Pb_238U+1))/0.00000000098485/1000000
-                        Corr_7_5_age_erro=(log(abs(result_cal_207Pb_235U-((result_cal_207Pb_206Pb-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*common_Pb*137.88*result_cal_206Pb_238U+1))/0.00000000098485/1000000)*((sqrt(pow((date_all[5][i]/date_all[4][i]),2)+0.0009)))
+                        Corr_7_5_age=log(abs(result_cal_207Pb_235U-((result_cal_207Pb_206Pb-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*common_Pb*137.818*result_cal_206Pb_238U+1))/0.00000000098485/1000000
+                        Corr_7_5_age_erro=(log(abs(result_cal_207Pb_235U-((result_cal_207Pb_206Pb-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*common_Pb*137.818*result_cal_206Pb_238U+1))/0.00000000098485/1000000)*((sqrt(pow((date_all[5][i]/date_all[4][i]),2)+excess_V*excess_V)))
                         Corr_6_8_age=(log(abs((1-(result_cal_207Pb_206Pb-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*result_cal_206Pb_238U)+1)/0.000000000155125)/1000000
-                        Corr_6_8_age_erro=((log(abs((1-(result_cal_207Pb_206Pb-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*result_cal_206Pb_238U)+1)/0.000000000155125)/1000000)*((sqrt(pow((date_all[3][i]/date_all[2][i]),2)+0.0009)))
+                        Corr_6_8_age_erro=((log(abs((1-(result_cal_207Pb_206Pb-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*result_cal_206Pb_238U)+1)/0.000000000155125)/1000000)*((sqrt(pow((date_all[3][i]/date_all[2][i]),2)+excess_V*excess_V)))
                         
                         Corr_7_5=exp(0.00000000098485*Corr_7_5_age*1000000)-1
                         Corr_7_5_erro=Corr_7_5*Corr_7_5_age_erro/Corr_7_5_age
@@ -1056,15 +1062,15 @@ def Age_Calculate():
                         s002=[File_name[i],ssf[i],result_cal_207Pb_206Pb,date_all[1][i],result_cal_206Pb_238U,date_all[3][i],result_cal_207Pb_235U,date_all[5][i],result_cal_208Pb_232Th,date_all[7][i],\
                               result_cal_208Pb_206Pb,date_all[9][i],
                               result_cal_232Th_206Pb,date_all[11][i],result_cal_208Pb_204Pb,date_all[13][i],
-                              '-------------',log(abs(result_cal_206Pb_238U+1))/(0.000000000155125)/1000000,(sqrt(pow(date_all[3][i]/result_cal_206Pb_238U,2)+0.0009))*(log(abs(result_cal_206Pb_238U+1))/(0.000000000155125)/1000000),\
-                              log(abs(result_cal_207Pb_235U+1))/(0.00000000098485)/1000000,(sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+0.0009))*(log(abs(result_cal_207Pb_235U+1))/(0.00000000098485)/1000000),\
-                              log(abs(result_cal_208Pb_232Th+1))/(0.000000000049475)/1000000,(sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th,2)+0.0009))*(log(abs(result_cal_208Pb_232Th+1))/(0.000000000049475)/1000000),\
-                              Age76Pb(result_cal_207Pb_206Pb),Age76Pb(result_cal_207Pb_206Pb+date_all[1][i])-Age76Pb(result_cal_207Pb_206Pb),'------------',log(abs(result_cal_207Pb_235U-((result_cal_207Pb_206Pb-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*common_Pb*137.88*result_cal_206Pb_238U+1))/0.00000000098485/1000000,\
-                              (log(abs(result_cal_207Pb_235U-((result_cal_207Pb_206Pb-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*common_Pb*137.88*result_cal_206Pb_238U+1))/0.00000000098485/1000000)*((sqrt(pow((date_all[5][i]/result_cal_207Pb_235U),2)+0.0009))),(log(abs((1-(result_cal_207Pb_206Pb-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*result_cal_206Pb_238U)+1)/0.000000000155125)/1000000,\
+                              '-------------',log(abs(result_cal_206Pb_238U+1))/(0.000000000155125)/1000000,(sqrt(pow(date_all[3][i]/result_cal_206Pb_238U,2)+excess_V*excess_V))*(log(abs(result_cal_206Pb_238U+1))/(0.000000000155125)/1000000),\
+                              log(abs(result_cal_207Pb_235U+1))/(0.00000000098485)/1000000,(sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+excess_V*excess_V))*(log(abs(result_cal_207Pb_235U+1))/(0.00000000098485)/1000000),\
+                              log(abs(result_cal_208Pb_232Th+1))/(0.000000000049475)/1000000,(sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th,2)+excess_V*excess_V))*(log(abs(result_cal_208Pb_232Th+1))/(0.000000000049475)/1000000),\
+                              Age76Pb(result_cal_207Pb_206Pb),Age76Pb(result_cal_207Pb_206Pb+date_all[1][i])-Age76Pb(result_cal_207Pb_206Pb),Coments[(File_name[i])],log(abs(result_cal_207Pb_235U-((result_cal_207Pb_206Pb-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*common_Pb*137.818*result_cal_206Pb_238U+1))/0.00000000098485/1000000,\
+                              (log(abs(result_cal_207Pb_235U-((result_cal_207Pb_206Pb-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*common_Pb*137.818*result_cal_206Pb_238U+1))/0.00000000098485/1000000)*((sqrt(pow((date_all[5][i]/result_cal_207Pb_235U),2)+excess_V*excess_V))),(log(abs((1-(result_cal_207Pb_206Pb-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*result_cal_206Pb_238U)+1)/0.000000000155125)/1000000,\
                               ((log(abs((1-(result_cal_207Pb_206Pb-Radioactive_Pb)/(common_Pb-Radioactive_Pb))*result_cal_206Pb_238U)+1)/0.000000000155125)/1000000)*\
-                              ((sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+0.0009))),\
-                              '------------',1/result_cal_206Pb_238U,(1/result_cal_206Pb_238U)*(sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+0.0009)*result_cal_206Pb_238U)/result_cal_206Pb_238U,\
-                              result_cal_207Pb_206Pb,date_all[1][i],'------------',result_cal_207Pb_235U,result_cal_207Pb_235U*sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+0.0009),result_cal_206Pb_238U,sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+0.0009)*result_cal_206Pb_238U,\
+                              ((sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+excess_V*excess_V))),\
+                              '------------',1/result_cal_206Pb_238U,(1/result_cal_206Pb_238U)*(sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+excess_V*excess_V)*result_cal_206Pb_238U)/result_cal_206Pb_238U,\
+                              result_cal_207Pb_206Pb,date_all[1][i],'------------',result_cal_207Pb_235U,result_cal_207Pb_235U*sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+excess_V*excess_V),result_cal_206Pb_238U,sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+excess_V*excess_V)*result_cal_206Pb_238U,\
                               rho,'------------',result_cal_208Pb_232Th,date_all[7][i],result_cal_208Pb_206Pb,date_all[9][i],'       ',abs(date_all[14][i]*coefficient_U),\
                           date_all[15][i]*coefficient_Th,(date_all[16][i]+date_all[17][i]+date_all[18][i])*coefficient_Pb,'-----',Corr_7_5,Corr_7_5_erro,Corr_6_8,Corr_6_8_erro,rho]
                         result_cal_age.append(s002)
@@ -1072,9 +1078,9 @@ def Age_Calculate():
 
                     elif PbCorrS.get()==2:
                         Corr_7_5_age=log(abs(result_cal_207Pb_235U*(result_cal_207Pb_206Pb/result_cal_208Pb_206Pb-common_Pb207_208)/(result_cal_207Pb_206Pb/result_cal_208Pb_206Pb)+1))/(0.00000000098485)/1000000
-                        Corr_7_5_age_erro=(log(abs(result_cal_207Pb_235U*(result_cal_207Pb_206Pb/result_cal_208Pb_206Pb-common_Pb207_208)/(result_cal_207Pb_206Pb/result_cal_208Pb_206Pb)+1))/(0.00000000098485)/1000000)*((sqrt(pow((date_all[5][i]/result_cal_207Pb_235U),2)+0.0009)*result_cal_207Pb_235U)/result_cal_207Pb_235U*100)/100
+                        Corr_7_5_age_erro=(log(abs(result_cal_207Pb_235U*(result_cal_207Pb_206Pb/result_cal_208Pb_206Pb-common_Pb207_208)/(result_cal_207Pb_206Pb/result_cal_208Pb_206Pb)+1))/(0.00000000098485)/1000000)*((sqrt(pow((date_all[5][i]/result_cal_207Pb_235U),2)+excess_V*excess_V)*result_cal_207Pb_235U)/result_cal_207Pb_235U*100)/100
                         Corr_6_8_age=log(abs(result_cal_206Pb_238U*(1/result_cal_208Pb_206Pb-common_Pb206_208)/(1/result_cal_208Pb_206Pb)+1))/(0.000000000155125)/1000000
-                        Corr_6_8_age_erro=(log(abs(result_cal_206Pb_238U*(1/result_cal_208Pb_206Pb-common_Pb206_208)/(1/result_cal_208Pb_206Pb)+1))/(0.000000000155125)/1000000)*((sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+0.0009)*result_cal_206Pb_238U)/result_cal_206Pb_238U*100)/100
+                        Corr_6_8_age_erro=(log(abs(result_cal_206Pb_238U*(1/result_cal_208Pb_206Pb-common_Pb206_208)/(1/result_cal_208Pb_206Pb)+1))/(0.000000000155125)/1000000)*((sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+excess_V*excess_V)*result_cal_206Pb_238U)/result_cal_206Pb_238U*100)/100
                         
 
                         
@@ -1091,17 +1097,17 @@ def Age_Calculate():
                         s002=[File_name[i],ssf[i],result_cal_207Pb_206Pb,date_all[1][i],result_cal_206Pb_238U,date_all[3][i],result_cal_207Pb_235U,date_all[5][i],result_cal_208Pb_232Th,date_all[7][i],\
                               result_cal_208Pb_206Pb,date_all[9][i],
                               result_cal_232Th_206Pb,date_all[11][i],result_cal_208Pb_204Pb,date_all[13][i],
-                              '-------------',log(abs(result_cal_206Pb_238U+1))/(0.000000000155125)/1000000,(sqrt(pow(date_all[3][i]/result_cal_206Pb_238U,2)+0.0009))*(log(abs(result_cal_206Pb_238U+1))/(0.000000000155125)/1000000),\
-                              log(abs(result_cal_207Pb_235U+1))/(0.00000000098485)/1000000,(sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+0.0009))*(log(abs(result_cal_207Pb_235U+1))/(0.00000000098485)/1000000),\
-                              log(abs(result_cal_208Pb_232Th+1))/(0.000000000049475)/1000000,(sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th,2)+0.0009))*(log(abs(result_cal_208Pb_232Th+1))/(0.000000000049475)/1000000),\
+                              '-------------',log(abs(result_cal_206Pb_238U+1))/(0.000000000155125)/1000000,(sqrt(pow(date_all[3][i]/result_cal_206Pb_238U,2)+excess_V*excess_V))*(log(abs(result_cal_206Pb_238U+1))/(0.000000000155125)/1000000),\
+                              log(abs(result_cal_207Pb_235U+1))/(0.00000000098485)/1000000,(sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+excess_V*excess_V))*(log(abs(result_cal_207Pb_235U+1))/(0.00000000098485)/1000000),\
+                              log(abs(result_cal_208Pb_232Th+1))/(0.000000000049475)/1000000,(sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th,2)+excess_V*excess_V))*(log(abs(result_cal_208Pb_232Th+1))/(0.000000000049475)/1000000),\
                               Age76Pb(result_cal_207Pb_206Pb),Age76Pb(result_cal_207Pb_206Pb+date_all[1][i])-Age76Pb(result_cal_207Pb_206Pb),
-                              '------------',log(abs(result_cal_207Pb_235U*(result_cal_207Pb_206Pb/result_cal_208Pb_206Pb-common_Pb207_208)/(result_cal_207Pb_206Pb/result_cal_208Pb_206Pb)+1))/(0.00000000098485)/1000000,\
+                              Coments[(File_name[i])],log(abs(result_cal_207Pb_235U*(result_cal_207Pb_206Pb/result_cal_208Pb_206Pb-common_Pb207_208)/(result_cal_207Pb_206Pb/result_cal_208Pb_206Pb)+1))/(0.00000000098485)/1000000,\
                                   (log(abs(result_cal_207Pb_235U*(result_cal_207Pb_206Pb/result_cal_208Pb_206Pb-common_Pb207_208)/(result_cal_207Pb_206Pb/result_cal_208Pb_206Pb)+1))/(0.00000000098485)/1000000)*\
-                                      ((sqrt(pow((date_all[5][i]/result_cal_207Pb_235U),2)+0.0009)*result_cal_207Pb_235U)/result_cal_207Pb_235U*100)/100,\
+                                      ((sqrt(pow((date_all[5][i]/result_cal_207Pb_235U),2)+excess_V*excess_V)*result_cal_207Pb_235U)/result_cal_207Pb_235U*100)/100,\
                                           log(abs(result_cal_206Pb_238U*(1/result_cal_208Pb_206Pb-common_Pb206_208)/(1/result_cal_208Pb_206Pb)+1))/(0.000000000155125)/1000000,\
                                               (log(abs(result_cal_206Pb_238U*(1/result_cal_208Pb_206Pb-common_Pb206_208)/(1/result_cal_208Pb_206Pb)+1))/(0.000000000155125)/1000000)*\
-                                                  ((sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+0.0009)*result_cal_206Pb_238U)/result_cal_206Pb_238U*100)/100,'------------',1/result_cal_206Pb_238U,(1/result_cal_206Pb_238U)*(sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+0.0009)*result_cal_206Pb_238U)/result_cal_206Pb_238U,\
-                              result_cal_207Pb_206Pb,date_all[1][i],'------------',result_cal_207Pb_235U,result_cal_207Pb_235U*sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+0.0009),result_cal_206Pb_238U,sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+0.0009)*result_cal_206Pb_238U,\
+                                                  ((sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+excess_V*excess_V)*result_cal_206Pb_238U)/result_cal_206Pb_238U*100)/100,'------------',1/result_cal_206Pb_238U,(1/result_cal_206Pb_238U)*(sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+excess_V*excess_V)*result_cal_206Pb_238U)/result_cal_206Pb_238U,\
+                              result_cal_207Pb_206Pb,date_all[1][i],'------------',result_cal_207Pb_235U,result_cal_207Pb_235U*sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+excess_V*excess_V),result_cal_206Pb_238U,sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+excess_V*excess_V)*result_cal_206Pb_238U,\
                               rho,'------------',result_cal_208Pb_232Th,date_all[7][i],result_cal_208Pb_206Pb,date_all[9][i],'       ',abs(date_all[14][i]*coefficient_U),\
                           date_all[15][i]*coefficient_Th,(date_all[16][i]+date_all[17][i]+date_all[18][i])*coefficient_Pb,'-----',Corr_7_5,Corr_7_5_erro,Corr_6_8,Corr_6_8_erro,rho]
                         result_cal_age.append(s002)
@@ -1110,17 +1116,17 @@ def Age_Calculate():
                         s002=[File_name[i],ssf[i],result_cal_207Pb_206Pb,date_all[1][i],result_cal_206Pb_238U,date_all[3][i],result_cal_207Pb_235U,date_all[5][i],result_cal_208Pb_232Th,date_all[7][i],\
                               result_cal_208Pb_206Pb,date_all[9][i],
                               result_cal_232Th_206Pb,date_all[11][i],result_cal_208Pb_204Pb,date_all[13][i],
-                              '-------------',log(abs(result_cal_206Pb_238U+1))/(0.000000000155125)/1000000,(sqrt(pow(date_all[3][i]/result_cal_206Pb_238U,2)+0.0009))*(log(abs(result_cal_206Pb_238U+1))/(0.000000000155125)/1000000),\
-                              log(abs(result_cal_207Pb_235U+1))/(0.00000000098485)/1000000,(sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+0.0009))*(log(abs(result_cal_207Pb_235U+1))/(0.00000000098485)/1000000),\
-                              log(abs(result_cal_208Pb_232Th+1))/(0.000000000049475)/1000000,(sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th,2)+0.0009))*(log(abs(result_cal_208Pb_232Th+1))/(0.000000000049475)/1000000),\
+                              '-------------',log(abs(result_cal_206Pb_238U+1))/(0.000000000155125)/1000000,(sqrt(pow(date_all[3][i]/result_cal_206Pb_238U,2)+excess_V*excess_V))*(log(abs(result_cal_206Pb_238U+1))/(0.000000000155125)/1000000),\
+                              log(abs(result_cal_207Pb_235U+1))/(0.00000000098485)/1000000,(sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+excess_V*excess_V))*(log(abs(result_cal_207Pb_235U+1))/(0.00000000098485)/1000000),\
+                              log(abs(result_cal_208Pb_232Th+1))/(0.000000000049475)/1000000,(sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th,2)+excess_V*excess_V))*(log(abs(result_cal_208Pb_232Th+1))/(0.000000000049475)/1000000),\
                               Age76Pb(result_cal_207Pb_206Pb),Age76Pb(result_cal_207Pb_206Pb+date_all[1][i])-Age76Pb(result_cal_207Pb_206Pb),
-                              '------------',log(abs(result_cal_207Pb_235U*(result_cal_207Pb_206Pb*result_cal_208Pb_204Pb/result_cal_208Pb_206Pb-common_Pb207_204)/(result_cal_207Pb_206Pb*result_cal_208Pb_204Pb/result_cal_208Pb_206Pb)+1))/(0.00000000098485)/1000000,\
+                              Coments[(File_name[i])],log(abs(result_cal_207Pb_235U*(result_cal_207Pb_206Pb*result_cal_208Pb_204Pb/result_cal_208Pb_206Pb-common_Pb207_204)/(result_cal_207Pb_206Pb*result_cal_208Pb_204Pb/result_cal_208Pb_206Pb)+1))/(0.00000000098485)/1000000,\
                                   (log(abs(result_cal_207Pb_235U*(result_cal_207Pb_206Pb*result_cal_208Pb_204Pb/result_cal_208Pb_206Pb-common_Pb207_204)/(result_cal_207Pb_206Pb*result_cal_208Pb_204Pb/result_cal_208Pb_206Pb)+1))/(0.00000000098485)/1000000)*\
-                                      ((sqrt(pow((date_all[5][i]/result_cal_207Pb_235U),2)+0.0009)*result_cal_207Pb_235U)/result_cal_207Pb_235U*100)/100,\
+                                      ((sqrt(pow((date_all[5][i]/result_cal_207Pb_235U),2)+excess_V*excess_V)*result_cal_207Pb_235U)/result_cal_207Pb_235U*100)/100,\
                                           log(abs(result_cal_206Pb_238U*(result_cal_208Pb_204Pb/result_cal_208Pb_206Pb-common_Pb206_204)/(result_cal_208Pb_204Pb/result_cal_208Pb_206Pb)+1))/(0.000000000155125)/1000000,\
                                               (log(abs(result_cal_206Pb_238U*(result_cal_208Pb_204Pb/result_cal_208Pb_206Pb-common_Pb206_204)/(result_cal_208Pb_204Pb/result_cal_208Pb_206Pb)+1))/(0.000000000155125)/1000000)*\
-                                                  ((sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+0.0009)*result_cal_206Pb_238U)/result_cal_206Pb_238U*100)/100,'------------',1/result_cal_206Pb_238U,(1/result_cal_206Pb_238U)*(sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+0.0009)*result_cal_206Pb_238U)/result_cal_206Pb_238U,\
-                              result_cal_207Pb_206Pb,date_all[1][i],'------------',result_cal_207Pb_235U,result_cal_207Pb_235U*sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+0.0009),result_cal_206Pb_238U,sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+0.0009)*result_cal_206Pb_238U,\
+                                                  ((sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+excess_V*excess_V)*result_cal_206Pb_238U)/result_cal_206Pb_238U*100)/100,'------------',1/result_cal_206Pb_238U,(1/result_cal_206Pb_238U)*(sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+excess_V*excess_V)*result_cal_206Pb_238U)/result_cal_206Pb_238U,\
+                              result_cal_207Pb_206Pb,date_all[1][i],'------------',result_cal_207Pb_235U,result_cal_207Pb_235U*sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+excess_V*excess_V),result_cal_206Pb_238U,sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+excess_V*excess_V)*result_cal_206Pb_238U,\
                               rho,'------------',result_cal_208Pb_232Th,date_all[7][i],result_cal_208Pb_206Pb,date_all[9][i],'       ',abs(date_all[14][i]*coefficient_U),\
                           date_all[15][i]*coefficient_Th,(date_all[16][i]+date_all[17][i]+date_all[18][i])*coefficient_Pb,'','','','','',rho]
                         result_cal_age.append(s002)
@@ -1128,25 +1134,25 @@ def Age_Calculate():
                         Cal204Pb=abs((date_all[17][i]-date_all[18][i]*radioactiveS_Pb207_206)/(common_Pb207_204-common_Pb206_204*radioactiveS_Pb207_206))
                         
                         #f206_238A,f207_235A,f208_232A
-                        #log(abs(f207_235A*137.88*((date_all[17][i]-Cal204Pb*common_Pb207_204)/date_all[14][i])+1))/(0.00000000098485)/1000000,\
-                            #log(abs(f207_235A*137.88*((date_all[17][i]-Cal204Pb*common_Pb207_204)/date_all[14][i])+1))/(0.00000000098485)/1000000*((sqrt(pow((date_all[5][i]/result_cal_207Pb_235U),2)+0.0009)*result_cal_207Pb_235U)/result_cal_207Pb_235U*100)/100,\
+                        #log(abs(f207_235A*137.818*((date_all[17][i]-Cal204Pb*common_Pb207_204)/date_all[14][i])+1))/(0.00000000098485)/1000000,\
+                            #log(abs(f207_235A*137.818*((date_all[17][i]-Cal204Pb*common_Pb207_204)/date_all[14][i])+1))/(0.00000000098485)/1000000*((sqrt(pow((date_all[5][i]/result_cal_207Pb_235U),2)+excess_V*excess_V)*result_cal_207Pb_235U)/result_cal_207Pb_235U*100)/100,\
                         s002=[File_name[i],ssf[i],result_cal_207Pb_206Pb,date_all[1][i],result_cal_206Pb_238U,date_all[3][i],result_cal_207Pb_235U,date_all[5][i],result_cal_208Pb_232Th,date_all[7][i],\
                               result_cal_208Pb_206Pb,date_all[9][i],
                               result_cal_232Th_206Pb,date_all[11][i],result_cal_208Pb_204Pb,date_all[13][i],
-                              '-------------',log(abs(result_cal_206Pb_238U+1))/(0.000000000155125)/1000000,(sqrt(pow(date_all[3][i]/result_cal_206Pb_238U,2)+0.0009))*(log(abs(result_cal_206Pb_238U+1))/(0.000000000155125)/1000000),\
-                              log(abs(result_cal_207Pb_235U+1))/(0.00000000098485)/1000000,(sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+0.0009))*(log(abs(result_cal_207Pb_235U+1))/(0.00000000098485)/1000000),\
-                              log(abs(result_cal_208Pb_232Th+1))/(0.000000000049475)/1000000,(sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th,2)+0.0009))*(log(abs(result_cal_208Pb_232Th+1))/(0.000000000049475)/1000000),\
+                              '-------------',log(abs(result_cal_206Pb_238U+1))/(0.000000000155125)/1000000,(sqrt(pow(date_all[3][i]/result_cal_206Pb_238U,2)+excess_V*excess_V))*(log(abs(result_cal_206Pb_238U+1))/(0.000000000155125)/1000000),\
+                              log(abs(result_cal_207Pb_235U+1))/(0.00000000098485)/1000000,(sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+excess_V*excess_V))*(log(abs(result_cal_207Pb_235U+1))/(0.00000000098485)/1000000),\
+                              log(abs(result_cal_208Pb_232Th+1))/(0.000000000049475)/1000000,(sqrt(pow(date_all[7][i]/result_cal_208Pb_232Th,2)+excess_V*excess_V))*(log(abs(result_cal_208Pb_232Th+1))/(0.000000000049475)/1000000),\
                               Age76Pb(result_cal_207Pb_206Pb),Age76Pb(result_cal_207Pb_206Pb+date_all[1][i])-Age76Pb(result_cal_207Pb_206Pb),
-                              '------------',log(abs(f206_238A*(date_all[18][i]-Cal204Pb*common_Pb206_204)/date_all[14][i]+1))/(0.000000000155125)/1000000,\
+                              Coments[(File_name[i])],log(abs(f206_238A*(date_all[18][i]-Cal204Pb*common_Pb206_204)/date_all[14][i]+1))/(0.000000000155125)/1000000,\
                                               (log(abs(f206_238A*(date_all[18][i]-Cal204Pb*common_Pb206_204)/date_all[14][i]+1))/(0.000000000155125)/1000000)*\
-                                                  ((sqrt(pow((date_all[3][i]/(date_all[2][i]*f206_238A)),2)+0.0009))),
+                                                  ((sqrt(pow((date_all[3][i]/(date_all[2][i]*f206_238A)),2)+excess_V*excess_V))),
                                                   log(abs(f208_232A*(date_all[16][i]-common_Pb208_204*Cal204Pb)/date_all[15][i]+1))/(0.000000000049475)/1000000,
                                                   (log(abs(f208_232A*(date_all[16][i]-common_Pb208_204*Cal204Pb)/date_all[15][i]+1))/(0.000000000049475)/1000000)*\
-                                                     ((sqrt(pow((date_all[7][i]/result_cal_208Pb_232Th),2)+0.0009))),'------------',1/result_cal_206Pb_238U,(1/result_cal_206Pb_238U)*(sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+0.0009)*result_cal_206Pb_238U)/result_cal_206Pb_238U,\
-                                 result_cal_207Pb_206Pb,date_all[1][i],'------------',result_cal_207Pb_235U,result_cal_207Pb_235U*sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+0.0009),result_cal_206Pb_238U,sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+0.0009)*result_cal_206Pb_238U,\
+                                                     ((sqrt(pow((date_all[7][i]/result_cal_208Pb_232Th),2)+excess_V*excess_V))),'------------',1/result_cal_206Pb_238U,(1/result_cal_206Pb_238U)*(sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+excess_V*excess_V)*result_cal_206Pb_238U)/result_cal_206Pb_238U,\
+                                 result_cal_207Pb_206Pb,date_all[1][i],'------------',result_cal_207Pb_235U,result_cal_207Pb_235U*sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+excess_V*excess_V),result_cal_206Pb_238U,sqrt(pow((date_all[3][i]/result_cal_206Pb_238U),2)+excess_V*excess_V)*result_cal_206Pb_238U,\
                                  rho,'------------',result_cal_208Pb_232Th,date_all[7][i],result_cal_208Pb_206Pb,date_all[9][i],'       ',abs(date_all[14][i]*coefficient_U),\
-                             date_all[15][i]*coefficient_Th,(date_all[16][i]+date_all[17][i]+date_all[18][i])*coefficient_Pb,'',137.88*((date_all[17][i]-Cal204Pb*common_Pb207_204)/date_all[14][i])*f207_235A,(sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+0.0009))*137.88*((date_all[17][i]-Cal204Pb*common_Pb207_204)/date_all[14][i])*f207_235A,
-                             f206_238A*(date_all[18][i]-Cal204Pb*common_Pb206_204)/date_all[14][i],(sqrt(pow(date_all[3][i]/result_cal_206Pb_238U,2)+0.0009))*f206_238A*(date_all[18][i]-Cal204Pb*common_Pb206_204)/date_all[14][i],rho]
+                             date_all[15][i]*coefficient_Th,(date_all[16][i]+date_all[17][i]+date_all[18][i])*coefficient_Pb,'',137.818*((date_all[17][i]-Cal204Pb*common_Pb207_204)/date_all[14][i])*f207_235A,(sqrt(pow(date_all[5][i]/result_cal_207Pb_235U,2)+excess_V*excess_V))*137.818*((date_all[17][i]-Cal204Pb*common_Pb207_204)/date_all[14][i])*f207_235A,
+                             f206_238A*(date_all[18][i]-Cal204Pb*common_Pb206_204)/date_all[14][i],(sqrt(pow(date_all[3][i]/result_cal_206Pb_238U,2)+excess_V*excess_V))*f206_238A*(date_all[18][i]-Cal204Pb*common_Pb206_204)/date_all[14][i],rho]
                                                      
                                                      
                             
@@ -1602,7 +1608,7 @@ def samples_method(name,Hg202_b,Hg204_b,Pb206_b,Pb207_b,Pb208_b,Th232_b,U238_b,H
     Pb208_Pb204_f=np.where(np.abs(Pb208_Pb204_s-np.average(Pb208_Pb204_s))<2*np.std(Pb208_Pb204_s),Pb208_Pb204_s,nan)
     
     
-    Pb207_U235_c=np.nanmean(Pb207_Pb206_f)*np.nanmean(Pb206_U238_f)*137.88
+    Pb207_U235_c=np.nanmean(Pb207_Pb206_f)*np.nanmean(Pb206_U238_f)*137.818
     
     if ele.get()==0:
         
@@ -1693,7 +1699,7 @@ def Std204m_method(name,Hg202_b,Hg204_b,Pb206_b,Pb207_b,Pb208_b,Th232_b,U238_b,H
     Pb208_Pb204_f=np.where(np.abs(Pb208_Pb204_s-np.average(Pb208_Pb204_s))<2*np.std(Pb208_Pb204_s),Pb208_Pb204_s,nan)
     
     
-    Pb207_U235_c=np.nanmean(Pb207_Pb206_f)*np.nanmean(Pb206_U238_f)*137.88
+    Pb207_U235_c=np.nanmean(Pb207_Pb206_f)*np.nanmean(Pb206_U238_f)*137.818
     
     if ele.get()==0:
         
@@ -1738,19 +1744,27 @@ def Std208_method(name,Hg202_b,Hg204_b,Pb206_b,Pb207_b,Pb208_b,Th232_b,U238_b,Hg
     m204_s=np.where(Hg204cal_s<(np.std(Hg204_s)/sqrt(end_s-start_s)),0,Hg204cal_s)    
     Pb204_s=np.average(Hg204_s)-np.average(Hg204_b)
    
-    U238_T=(np.average(U238_s)-np.average(U238_b))
-    Th232_T=(np.average(Th232_s)-np.average(Th232_b))
-    Pb208_T=(np.average(Pb208_s)-np.average(Pb208_b))
-    Pb207_T=(np.average(Pb207_s)-np.average(Pb207_b))
-    Pb206_T=(np.average(Pb206_s)-np.average(Pb206_b))
+    U238_T=(U238_s-np.average(U238_b))
+    Th232_T=(Th232_s-np.average(Th232_b))
+    Pb208_T=(Pb208_s-np.average(Pb208_b))
+    Pb207_T=(Pb207_s-np.average(Pb207_b))
+    Pb206_T=(Pb206_s-np.average(Pb206_b))
     
     Pbc_64,Pbc_74,Pbc_84,Pbc_68,Pbc_78=SK2model(Standard_age)
     Pb207_208m=Pb207_T/Pb208_T
     Pb206_208m=Pb206_T/Pb208_T
-    Pb207_Pb206_s=(Pb207_s-np.average(Pb207_b)*((Pb207_208m-Pbc_78)/Pb207_208m))/(Pb206_s-np.average(Pb206_b))*((Pb206_208m-Pbc_68)/Pb206_208m)
+    
+    if (np.average(Pb207_T)==np.average(Pb208_T)*Pbc_78) or (np.average(Pb206_T)==np.average(Pb208_T)*Pbc_68):
+        Pb207_Pb206_s=(Pb207_s-np.average(Pb207_b)*((Pb207_208m-Pbc_78)/Pb207_208m))/(Pb206_s-np.average(Pb206_b))*((Pb206_208m-Pbc_68)/Pb206_208m)
 
-    Pb206_U238_s=(Pb206_s-np.average(Pb206_b))*((Pb206_208m-Pbc_68)/Pb206_208m)/(U238_s-np.average(U238_b))
+        Pb206_U238_s=(Pb206_s-np.average(Pb206_b))*((Pb206_208m-Pbc_68)/Pb206_208m)/(U238_s-np.average(U238_b))
        
+        
+        R86ERRO=0
+    else:
+        Pb207_Pb206_s= (Pb207_T-Pb208_T*Pbc_78)/(Pb206_T-Pb208_T*Pbc_68)
+        Pb206_U238_s=(Pb206_T-Pb208_T*Pbc_68)/U238_T
+        print(Pb207_Pb206_s)
     Pb208_Th232_s=(Pb208_s-np.average(Pb208_b))/(Th232_s-np.average(Th232_b))    
     Pb208_Pb206_s=(Pb208_s-np.average(Pb208_b))/(Pb206_s-np.average(Pb206_b))    
     Th232_Pb206_s=Th232_s/Pb206_s    
@@ -1785,7 +1799,7 @@ def Std208_method(name,Hg202_b,Hg204_b,Pb206_b,Pb207_b,Pb208_b,Th232_b,U238_b,Hg
     Pb208_Pb204_f=np.where(np.abs(Pb208_Pb204_s-np.average(Pb208_Pb204_s))<2*np.std(Pb208_Pb204_s),Pb208_Pb204_s,nan)
     
     
-    Pb207_U235_c=np.nanmean(Pb207_Pb206_f)*np.nanmean(Pb206_U238_f)*137.88
+    Pb207_U235_c=np.nanmean(Pb207_Pb206_f)*np.nanmean(Pb206_U238_f)*137.818
     
     if ele.get()==0:
         
@@ -1810,7 +1824,7 @@ def Std208_method(name,Hg202_b,Hg204_b,Pb206_b,Pb207_b,Pb208_b,Th232_b,U238_b,Hg
                     2*np.nanstd(Th232_Pb206_f)/sqrt(len(Th232_Pb206_f)-np.count_nonzero(np.isnan(Th232_Pb206_f))),
                     np.nanmean(Pb208_Pb204_f),\
                     2*np.nanstd(Pb208_Pb204_f)/sqrt(len(Pb208_Pb204_f)-np.count_nonzero(np.isnan(Pb208_Pb204_f)))
-                    ,'------',U238_T,Th232_T,Pb208_T,Pb207_T,Pb206_T]
+                    ,'------',np.average(U238_T),np.average(Th232_T),np.average(Pb208_T),np.average(Pb207_T),np.average(Pb206_T)]
     
     return result_samples
 
@@ -1918,7 +1932,7 @@ def Std208_method(name,Hg202_b,Hg204_b,Pb206_b,Pb207_b,Pb208_b,Th232_b,U238_b,Hg
     Pb208_Pb204_f=np.where(np.abs(Pb208_Pb204_s-np.average(Pb208_Pb204_s))<2*np.std(Pb208_Pb204_s),Pb208_Pb204_s,nan)
     
     
-    Pb207_U235_c=np.nanmean(Pb207_Pb206_f)*np.nanmean(Pb206_U238_f)*137.88
+    Pb207_U235_c=np.nanmean(Pb207_Pb206_f)*np.nanmean(Pb206_U238_f)*137.818
     
     if ele.get()==0:
         
@@ -2033,7 +2047,7 @@ def Std207_method(name,Hg202_b,Hg204_b,Pb206_b,Pb207_b,Pb208_b,Th232_b,U238_b,Hg
     Pb208_Pb204_f=np.where(np.abs(Pb208_Pb204_s-np.average(Pb208_Pb204_s))<2*np.std(Pb208_Pb204_s),Pb208_Pb204_s,nan)
     
     
-    Pb207_U235_c=np.nanmean(Pb207_Pb206_f_corr)*np.nanmean(Pb206_U238_f)*137.88
+    Pb207_U235_c=np.nanmean(Pb207_Pb206_f_corr)*np.nanmean(Pb206_U238_f)*137.818
     
     if ele.get()==0:
         
@@ -2136,7 +2150,7 @@ def Std_method(name,Hg202_b,Hg204_b,Pb206_b,Pb207_b,Pb208_b,Th232_b,U238_b,Hg202
         
         Pb208_Pb204_f=np.where(np.abs(Pb208_Pb204_s-np.average(Pb208_Pb204_s))<2*np.std(Pb208_Pb204_s),Pb208_Pb204_s,nan)
         
-        Pb207_U235_c=np.nanmean(Pb207_Pb206_f)*np.nanmean(Pb206_U238_f)*137.88
+        Pb207_U235_c=np.nanmean(Pb207_Pb206_f)*np.nanmean(Pb206_U238_f)*137.818
         
 
         corr_Pb207_206=np.nanmean(Pb207_Pb206_f)
@@ -2146,7 +2160,7 @@ def Std_method(name,Hg202_b,Hg204_b,Pb206_b,Pb207_b,Pb208_b,Th232_b,U238_b,Hg202
         else:
             No=name
         result_std=[No,name,sampleslist[name],np.nanmean(Pb207_Pb206_f),\
-                    2*np.nanstd(Pb207_U235_c/Pb206_U238_f/137.88)/sqrt(len(Pb207_U235_c/Pb206_U238_f/137.88)-np.count_nonzero(np.isnan(Pb207_U235_c/Pb206_U238_f/137.88))),
+                    2*np.nanstd(Pb207_U235_c/Pb206_U238_f/137.818)/sqrt(len(Pb207_U235_c/Pb206_U238_f/137.818)-np.count_nonzero(np.isnan(Pb207_U235_c/Pb206_U238_f/137.818))),
                     np.nanmean(Pb206_U238_f),\
                     2*np.nanstd(Pb206_U238_f)/sqrt(len(Pb206_U238_f)-np.count_nonzero(np.isnan(Pb206_U238_f))),
                     Pb207_U235_c,\
@@ -2179,6 +2193,8 @@ def Std_method(name,Hg202_b,Hg204_b,Pb206_b,Pb207_b,Pb208_b,Th232_b,U238_b,Hg202
 
 def showplt(event):
     global special_idx
+    var6.set('')
+    
     try:
         index = theLB.curselection()
         
@@ -2192,7 +2208,17 @@ def showplt(event):
             #print(var)
             x,y1,y2,y3,y4,y5,y6,y7=loaddata(var,isoname)
             numn=np.load('Time_setting.npy',allow_pickle='True').item()
-            #print(numn)
+            
+                          
+            Coments=np.load('Coments.npy',allow_pickle='True').item() 
+            
+
+            
+            
+            #entry_6.insert(0,Coments[var])
+            
+            
+                
             
             
             
@@ -2227,13 +2253,14 @@ def showplt(event):
         
         
         
-            
+            #plt.text(0.5,0.5,"Coments:"+Coments[var])
             plt.axvline(b0,color='b',linestyle='--',label='bcg_s',linewidth=3)
             plt.axvline(b1,color='b',linestyle='--',label='bcg_e',linewidth=3)
             plt.axvline(s0,color='black',linestyle='--',label='sig_s',linewidth=3)
             plt.axvline(s1,color='black',linestyle='--',label='sig_e',linewidth=3)
             
-            plt.title(var.split('.')[0]+'  :{'+sampleslist[var]+'}')
+            plt.title(var.split('.')[0]+'  :{'+sampleslist[var]+'}'+' '+Coments[var])
+            
             plt.tight_layout()
             fname=var.split('.')[0]        
             save=plt.savefig(outputpath+'//'+fname+'.png')
@@ -2288,6 +2315,7 @@ def instructure0():
     global fig_name
     
     num={}
+    com={}
     window = tk.Tk()
     window.title('Loading......')
     window.geometry('630x150')
@@ -2317,6 +2345,7 @@ def instructure0():
             if os.path.splitext(name)[1]=='.csv':
                 files_list.append(name)
         for name in files_list:
+            com[name]=''
             w.create_text(90,10,text=f'Loading.... {name} ')
             a='*'*i
             b='.'*(scale-i)
@@ -2433,6 +2462,7 @@ def instructure0():
             #print("\r{:^3.0f}%[{}->{}]".format(c,a,b),end='')
     #print(sampleslist)
     np.save(outputpath+'//'+'Time_setting',num)
+    np.save(outputpath+'//'+'Coments',com)
     window.destroy()
     '''if max(num.values())-min(num.values())>=5:
         print()
@@ -2544,7 +2574,7 @@ def instructure1():
     sampleslist={}
     os.chdir(outputpath)
     
-   
+    com={}
     with open("samples.csv", "a", newline='') as s:
         
         writer=csv.writer(s)
@@ -2618,6 +2648,7 @@ def instructure1():
       
         
     for name in files_list:
+        com[name]=''
         w.create_text(90,10,text=f'Loading.... {name} ')  
         a='*'*i
         b='.'*(scale-i)
@@ -2719,6 +2750,7 @@ def instructure1():
         #print("\r{:^3.0f}%[{}->{}]".format(c,a,b),end='')
         w.delete("all")  
     np.save(outputpath+'//'+'Time_setting',num)
+    np.save(outputpath+'//'+'Coments',com)
     window.destroy()
     tk.messagebox.showinfo(title='Information！', message='Loading compeleted！Total '+str(len(sampleslist))+'files')
     '''if max(num.values()[0])-min(num.values()[0])>=5:
@@ -2847,6 +2879,7 @@ def instructure2():
     global fig_name
     global num
     num={}
+    com={}
     root = tk.Tk()
     root.withdraw()
     default_dir=inputpath
@@ -2930,6 +2963,7 @@ def instructure2():
         
         
         name=fname
+        com[name]=''
         w.create_text(90,10,text=f'Loading.... {name} ')
         
         isoname=['Time','Hg202','Pb204','Pb206','Pb207','Pb208','Th232','U238']
@@ -3030,6 +3064,7 @@ def instructure2():
         w.delete("all")
         #print("\r{:^3.0f}%[{}->{}]".format(c,a,b),end='')
     np.save(outputpath+'//'+'Time_setting',num)
+    np.save(outputpath+'//'+'Coments',com)
     window.destroy()    
     '''if max(num.values())-min(num.values())>=5:
         print()
@@ -3135,6 +3170,7 @@ def instructure2():
         
     
 def dataprocess_selected():
+    
 
     logging.debug('Correction for selected samples.' )
     index = theLB.curselection()
@@ -3296,8 +3332,8 @@ def PbCorrSamples():
         if Ms:
             age=tk.simpledialog.askfloat(title = 'Estimated age of samples',prompt='Age(Ma):',initialvalue = '100')
 
-            Radioactive_Pb=(1/137.88)*(exp(0.00000000098485*age*1000000)-1)/(exp(0.000000000155125*age*1000000)-1)
-            common_Pb=(15.628-(exp(0.00000000098485*age*1000000)-1)*(9.735/137.88))/(18.700-(exp(0.000000000155125*age*1000000)-1)*9.735)
+            Radioactive_Pb=(1/137.818)*(exp(0.00000000098485*age*1000000)-1)/(exp(0.000000000155125*age*1000000)-1)
+            common_Pb=(15.628-(exp(0.00000000098485*age*1000000)-1)*(9.735/137.818))/(18.700-(exp(0.000000000155125*age*1000000)-1)*9.735)
         else:
             Radioactive_Pb=tk.simpledialog.askfloat(title = 'Radioactive Pb of samples',prompt='Radioactive 207Pb/206Pb:',initialvalue = '0.048015')
             common_Pb=tk.simpledialog.askfloat(title = 'Initial Pb  of samples',prompt='Initial 207Pb/206Pb:',initialvalue = '0.842185')
@@ -3309,18 +3345,18 @@ def PbCorrSamples():
 
             
             common_Pb206_208=(18.700-(exp(0.000000000155125*age*1000000)-1)*9.735)/(38.630-(exp(0.000000000049475*age*1000000)-1)*36.630)
-            common_Pb207_208=(15.628-(exp(0.00000000098485*age*1000000)-1)*(9.735/137.88))/(38.630-(exp(0.000000000049475*age*1000000)-1)*36.630)
+            common_Pb207_208=(15.628-(exp(0.00000000098485*age*1000000)-1)*(9.735/137.818))/(38.630-(exp(0.000000000049475*age*1000000)-1)*36.630)
         else:
             
             common_Pb206_208=tk.simpledialog.askfloat(title = 'Initial Pb  of samples',prompt='Initial 206Pb/208Pb:',initialvalue = '0.48240')
             common_Pb207_208=tk.simpledialog.askfloat(title = 'Initial Pb  of samples',prompt='Initial 207Pb/208Pb:',initialvalue = '0.40628')
         return common_Pb206_208,common_Pb207_208
     elif PbCorrS.get()==3:
-        Ms=tk.messagebox.askyesno(title = 'Sample Pb correction mode(208Pb)',message="Calculated by entering age ('Y') or Pb isotope  (' N ')?")
+        Ms=tk.messagebox.askyesno(title = 'Sample Pb correction mode(204Pb)',message="Calculated by entering age ('Y') or Pb isotope  (' N ')?")
         if Ms:
             age=tk.simpledialog.askfloat(title = 'Estimated age of samples',prompt='Age(Ma):',initialvalue = '100')
 
-            common_Pb207_204=(15.628-(exp(0.00000000098485*age*1000000)-1)*(9.735/137.88))
+            common_Pb207_204=(15.628-(exp(0.00000000098485*age*1000000)-1)*(9.735/137.818))
             common_Pb206_204=(18.700-(exp(0.000000000155125*age*1000000)-1)*9.735)
         else:
             common_Pb207_204=tk.simpledialog.askfloat(title = 'Initial Pb  of samples',prompt='Initial 207Pb/204Pb:',initialvalue = '15.6207')
@@ -3331,16 +3367,16 @@ def PbCorrSamples():
         if Ms:
             age=tk.simpledialog.askfloat(title = 'Estimated age of samples',prompt='Age(Ma):',initialvalue = '100')
 
-            common_Pb207_204=(15.628-(exp(0.00000000098485*age*1000000)-1)*(9.735/137.88))
+            common_Pb207_204=(15.628-(exp(0.00000000098485*age*1000000)-1)*(9.735/137.818))
             common_Pb206_204=(18.700-(exp(0.000000000155125*age*1000000)-1)*9.735)
             common_Pb208_204=(38.630-(exp(0.000000000049475*age*1000000)-1)*36.630)
-            radioactiveS_Pb207_206=(exp(0.00000000098485*age*1000000)-1)/(137.88*(exp(0.000000000155125*age*1000000)-1))
+            radioactiveS_Pb207_206=(exp(0.00000000098485*age*1000000)-1)/(137.818*(exp(0.000000000155125*age*1000000)-1))
             
         else:
             common_Pb207_204=tk.simpledialog.askfloat(title = 'Initial Pb  of samples',prompt='Initial 207Pb/204Pb:',initialvalue = '15.6207')
             common_Pb206_204=tk.simpledialog.askfloat(title = 'Initial Pb  of samples',prompt='Initial 206Pb/204Pb:',initialvalue = '18.5478')
             common_Pb208_204=tk.simpledialog.askfloat(title = 'Initial Pb  of samples',prompt='Initial 208Pb/204Pb:',initialvalue = '38.447')
-            radioactiveS_Pb207_206=(exp(0.00000000098485*age*1000000)-1)/(137.88*(exp(0.000000000155125*age*1000000)-1))
+            radioactiveS_Pb207_206=(exp(0.00000000098485*age*1000000)-1)/(137.818*(exp(0.000000000155125*age*1000000)-1))
         return common_Pb207_204,common_Pb206_204,radioactiveS_Pb207_206,common_Pb208_204
       
         
@@ -3366,11 +3402,15 @@ def main():
     global var1
     global var3
     global var4
+    global var5
+    global var6
     global num
     global start_b
     global start_s
     global end_s
     global end_b
+    
+    
     
     multi=8
     #bcg_from=3
@@ -3565,10 +3605,10 @@ def main():
         a=exp(0.000000000155125*age*1000000)-1
         b=exp(0.00000000098485*age*1000000)-1
         c=exp(0.000000000049475*age*1000000)-1
-        P382=1/137.88*(b/a)
+        P382=1/137.818*(b/a)
             
         Q8=18.700-a*9.735
-        R8=15.628-b*(9.735/137.88)            
+        R8=15.628-b*(9.735/137.818)            
         S8=38.630-c*36.837
         Pbc=R8/Q8
         return R8,Q8,S8,P382,a,b,c,Pbc
@@ -3709,7 +3749,7 @@ def main():
             return Standard_names,standard
         '''
         
-     
+
 
     def setbcg_multi():
         numn=np.load('Time_setting.npy',allow_pickle='True').item()
@@ -3867,7 +3907,7 @@ def main():
             
     var_s=IntVar()
     cal_button=Button(frmRT, text = "Fractionation correction", command = dataprocess)    
-
+    #cal_button.grid(row =5,column =0)
     #plot_button=Button(frmLB,text='Samples List',width = 18)
     #plot_button_all=Button(frmLB,text='绘制信号图(全)',command=drawsignalplt)  
     set_time_all = Button(frmLB, text='Signal selection',width=20)
@@ -3881,21 +3921,38 @@ def main():
             return True
         else:
             return False
+    def changestate():
+        index = special_idx
+        if theLB.get(index):
+            var=theLB.get(index)
+            
+            Coments=np.load('Coments.npy',allow_pickle='True').item() 
+            Comment_text=entry_6.get()
+            Coments[var]=Comment_text 
+            np.save('Coments',Coments) 
+            #entry_6.select_clear()
+            print(var,':',Comment_text)
+        else:
+            pass
+        
  
     var0 = StringVar()
     var1 = StringVar()
     var3 = StringVar()
     var4 = StringVar()
-    
+    var5 = StringVar()
+    var6=StringVar()
     var0.set(3)
     var1.set(10)
     var3.set(30)
     var4.set(60)
+    var5.set(3)
     
     bcg_from=float(var0.get())
     bcg_to=float(var1.get())
     sig_from=float(var3.get())
     sig_to=float(var4.get())
+    
     
     entry0 =Entry(frmLB, bd=0,bg='lightcyan',width =6,textvariable=var0,validate='key',validatecommand=(test,'%P'))
     entry0.grid(row =6,column =6)
@@ -3906,10 +3963,16 @@ def main():
     entry_4=Entry(frmLB, bd=0,bg='lightcyan',width =6,textvariable=var4,validate='key',validatecommand=(test,'%P'))
     entry_4.grid(row =9,column =6)
     
+    entry_5=Entry(frmRT, bd=0,bg='lightcyan',width =4,textvariable=var5,validate='key',validatecommand=(test,'%P'))
+    entry_5.grid(row =3,column =7,padx=3)
+    global entry_6
     
-
     
+    entry_6=Entry(frmLB, bd=0,bg='lightblue',width =12,textvariable=var6,validate='key',validatecommand=(test,'%P'))
+    entry_6.grid(row =11,column =6)
     
+    CommentsButton=tk.Button(frmLB,text='Save',command=changestate,padx=5)
+    CommentsButton.grid(row =12,column =5,columnspan=2)
     
     
 
@@ -3925,10 +3988,24 @@ def main():
     Label_4=Label(frmLB,width=8,text='Sig end(s):',padx=5)
     Label_4.grid(row =9,column =5)
     
-
+    Label_5=Label(frmRT,width=4,text='Ɛ(%):',padx=5)
+    Label_5.grid(row =3,column =6)
+    
+    Label_6=Label(frmLB,width=8,text='Comments:',padx=5)
+    Label_6.grid(row =11,column =4,columnspan =2)
+    
+    
+    
+    
     
     ApplyButton=Button(frmLB,text='Set (All)',command=setbcg_multi,width=10)
     ApplyButton.grid(row =10,column =6)
+    
+
+    
+
+    
+    
     ClearButton=Button(frmLB,text='Set (Single)',command=setbcg_single,width=10)
     ClearButton.grid(row =10,column =5)
     frmTR.grid(row=0,column=4,columnspan=4,rowspan=1)
@@ -3937,7 +4014,7 @@ def main():
     
     frmLT.grid(row=1,column=0,columnspan=8,rowspan=1)
     frmLLT.grid(row=4,column=0,columnspan=8) 
-    frmRT.grid(row = 5,column = 5,columnspan=2)
+    frmRT.grid(row = 5,column = 5,columnspan=8)
      
     frmLC.grid(row =5,column = 0,rowspan=2)
     frmRC.grid(row=6,column = 5,columnspan=2)
@@ -3990,7 +4067,7 @@ def main():
     choose_method3button.grid(row=1,column=3,pady=10,padx=5)
     choose_method4button.grid(row=1,column=4,pady=12,padx=5)
     
-    cal_button.grid(row =3,column = 5,padx=10,pady=10)
+    cal_button.grid(row =3,column = 0,padx=10,pady=10)
     
     sr1.grid(row =3,column =0,pady=10,padx=5)
     sr2.grid(row =3,column = 1,columnspan=3,pady=10,padx=5)
