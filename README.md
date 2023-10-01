@@ -28,5 +28,6 @@ The following steps 1.1.1-1.1.5 is run before Isoclock runs for the first time.
 
 If everything is already installed, follow only steps1.1.5. If you are Windows user, you can also run the Isoclock.exe directly.
 
-
+Instruction video:
+https://www.youtube.com/watch?v=-MocFvCSmBc
 
