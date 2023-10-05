@@ -31,3 +31,9 @@ If everything is already installed, follow only steps1.1.5. If you are Windows u
 Instruction video:
 https://www.youtube.com/watch?v=-MocFvCSmBc
 
+Download usermaual video:
+https://1drv.ms/v/s!AjpkANeM2uTjmhahbMfLjdQhGS_U?e=WcoUTD
+
+Download exe package for Windows:
+https://onedrive.live.com/?authkey=%21AFzznagJI7etH5k&cid=E3E4DA8CD700643A&id=E3E4DA8CD700643A%213298&parId=root&o=OneUp
+
